@@ -1,0 +1,9 @@
+node_modules
+dist
+*.local
+.DS_Store
+
+# 截圖與審計產物
+shot_*.png
+audit/
+audit_sheets/

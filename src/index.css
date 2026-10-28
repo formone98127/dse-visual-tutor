@@ -1,0 +1,160 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui,
+    -apple-system, sans-serif;
+  --font-serif: "Noto Serif TC", "Songti TC", Georgia, serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background-color: #0a0a0c;
+  color: #fafafa;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Theater 用嘅極淡格線，配 radial mask 令邊緣淡出 */
+.stage-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 70% 65% at 50% 45%, black 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 65% at 50% 45%, black 30%, transparent 75%);
+}
+
+/* ---- Lab 舞台（PyramidLab 等）+ 互動 chip ---- */
+.idx-lab {
+  width: min(720px, 92%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.vm-svg {
+  width: 100%;
+  overflow: visible;
+}
+.idx-lab .vm-svg {
+  max-height: min(60vh, 560px);
+}
+.idx-chip {
+  cursor: pointer;
+}
+.idx-chip-bg {
+  fill: rgba(255, 255, 255, 0.05);
+  stroke: rgba(242, 245, 255, 0.35);
+  stroke-width: 1.6;
+  transition:
+    fill 0.2s ease,
+    stroke 0.2s ease;
+}
+.idx-chip:hover .idx-chip-bg {
+  fill: rgba(255, 209, 102, 0.12);
+  stroke: rgba(255, 209, 102, 0.6);
+}
+.idx-chip.is-wrong .idx-chip-bg {
+  fill: rgba(255, 107, 122, 0.3);
+  stroke: rgba(255, 107, 122, 0.85);
+  animation: idx-shake 0.32s ease;
+}
+.idx-chip.solved .idx-chip-bg {
+  fill: rgba(255, 209, 102, 0.26);
+  stroke: rgba(255, 209, 102, 0.9);
+}
+.idx-chip.dim {
+  opacity: 0.35;
+}
+.idx-pulse {
+  animation: idx-pulse 1.6s ease-in-out infinite;
+}
+@keyframes idx-pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes idx-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+/* ---- Sidebar 手風琴：grid-rows 過場 + 轉 mode 淡入 ---- */
+.acc-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.acc-body.open {
+  grid-template-rows: 1fr;
+}
+.acc-body > div {
+  overflow: hidden;
+  min-height: 0;
+}
+.chev {
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+.chev.open {
+  transform: rotate(180deg);
+}
+@keyframes syllabus-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.syllabus-in {
+  animation: syllabus-in 0.35s ease both;
+}
+
+/* ---- 字幕 phase badge（題目 cyan / 已知條件 gold / 問咩 pink / 點解·驗證 green / 到你 pink） ---- */
+.beat-tag {
+  display: inline-block;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+.beat-tag.tag-q {
+  color: #4cc9f0;
+  border-color: rgba(76, 201, 240, 0.55);
+  background: rgba(76, 201, 240, 0.1);
+}
+.beat-tag.tag-el {
+  color: #ffd166;
+  border-color: rgba(255, 209, 102, 0.55);
+  background: rgba(255, 209, 102, 0.1);
+}
+.beat-tag.tag-ask {
+  color: #ff8fa0;
+  border-color: rgba(255, 107, 122, 0.55);
+  background: rgba(255, 107, 122, 0.1);
+}
+.beat-tag.tag-why {
+  color: #b8f27c;
+  border-color: rgba(184, 242, 124, 0.5);
+  background: rgba(184, 242, 124, 0.1);
+}
