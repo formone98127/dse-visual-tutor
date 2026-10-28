@@ -21,10 +21,10 @@ body {
 
 @media (max-width: 767px) {
   .idx-lab {
-    width: 97%;
+    width: 100%;
   }
   .idx-lab .vm-svg {
-    max-height: 46vh;
+    max-height: 40vh;
   }
 }
 

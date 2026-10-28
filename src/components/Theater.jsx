@@ -70,7 +70,7 @@ export default function Theater({ mode, lesson, beat, pendingTitle, unitTitle, s
   const playing = snap.lesson && snap.beat && Lab
 
   return (
-    <section className="relative h-[70%] w-full overflow-hidden bg-black">
+    <section className="relative h-[58%] w-full overflow-hidden bg-black md:h-[70%]">
       {/* 柔和的舞台燈光 */}
       <div
         className="pointer-events-none absolute inset-0"
@@ -100,9 +100,9 @@ export default function Theater({ mode, lesson, beat, pendingTitle, unitTitle, s
         Theater · {snap.lesson ? snap.lesson.title : snap.mode === 'DSE' ? '高中' : '初中'}
       </span>
 
-      {/* 右上角：小標題 · 而家上到邊一小節（同左上角對稱；手機版 right-4 唔使讓位） */}
+      {/* 右上角：小標題 · 而家上到邊一小節（同左上角對稱；手機版收起避免同左標題相撞） */}
       {unitTitle && (
-        <span className="absolute right-4 top-4 z-10 text-right text-[10px] font-medium tracking-[0.35em] text-zinc-500 md:right-8 md:top-7">
+        <span className="absolute right-4 top-4 z-10 hidden text-right text-[10px] font-medium tracking-[0.35em] text-zinc-500 md:right-8 md:top-7 md:block">
           {unitTitle}
         </span>
       )}

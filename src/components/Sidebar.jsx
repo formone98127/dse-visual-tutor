@@ -21,7 +21,7 @@ function ModeToggle({ mode, onChange }) {
             role="tab"
             aria-selected={active}
             onClick={() => onChange(opt.key)}
-            className={`flex-1 rounded-full px-2 py-2.5 text-sm font-bold transition-all duration-300 ${
+            className={`flex-1 whitespace-nowrap rounded-full px-1.5 py-2.5 text-[13px] font-bold transition-all duration-300 md:px-2 md:text-sm ${
               active
                 ? 'bg-gradient-to-r from-amber-300 to-amber-500 text-zinc-950 shadow-lg shadow-amber-500/20'
                 : 'text-zinc-400 hover:bg-white/5 hover:text-white'

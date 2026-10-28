@@ -28,7 +28,7 @@ export default function ControlDeck({ beat, index, total, stage = 0, steps = 1, 
   const parsed = beat ? splitBeatTag(beat.caption) : null
 
   return (
-    <section className="relative flex h-[30%] w-full flex-col border-t border-white/[0.08] bg-[#15151a]">
+    <section className="relative flex h-[42%] w-full flex-col border-t border-white/[0.08] bg-[#15151a] md:h-[30%]">
       {/* 坐喺分隔橫綫左邊：舞台縮放（字體＋圖畫一齊等比，0.7–1.4 倍） */}
       {onZoom && (
         <div className="absolute left-4 top-0 z-10 flex -translate-y-1/2 items-center gap-1.5 rounded-full border border-white/10 bg-gradient-to-b from-black to-[#15151a] px-2.5 py-1 md:left-8">
