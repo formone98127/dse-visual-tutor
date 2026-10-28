@@ -28,7 +28,7 @@ function Stage({ title, stage, children, lines = [], ds = 0 }) {
   return (
     <div className="idx-lab">
       <svg className="vm-svg" viewBox="0 0 430 330" role="img">
-        <text x={215} y={22} textAnchor="middle" fontSize={14} fill={GOLD} fontWeight={700}
+        <text x={215} y={26} textAnchor="middle" fontSize={25} fill={GOLD} fontWeight={700}
           fontFamily={SERIF} letterSpacing={2}>
           {title}
         </text>
