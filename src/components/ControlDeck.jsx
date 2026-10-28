@@ -33,10 +33,13 @@ export default function ControlDeck({ beat, index, total, stage = 0, steps = 1, 
 
   return (
     <section className="relative flex h-[30%] w-full flex-col border-t border-white/[0.08] bg-[#15151a]">
-      {/* 右上角：頁內推演圓點 + 步數（冇課程時唔顯示） */}
+      {/* 右上角：滑動提示(手機) / 快速鍵(桌面) + 頁內圓點 + 步數 */}
       <div className="absolute right-4 top-4 flex items-center gap-3 md:right-8 md:top-5">
         {total > 0 && (
           <>
+            <span className="text-[10px] tracking-[0.15em] text-zinc-600 md:hidden">
+              滑動 ↑↓
+            </span>
             <span className="hidden text-[10px] tracking-[0.15em] text-zinc-600 md:inline">
               快速鍵 ↑↓
             </span>

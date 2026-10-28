@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Sidebar from './components/Sidebar.jsx'
 import Theater from './components/Theater.jsx'
 import ControlDeck from './components/ControlDeck.jsx'
@@ -99,6 +99,22 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [goNext, goPrev])
 
+  // 手機滑動：向上滑 = 下一步，向下滑 = 上一步（淨係認垂直方向，斜側唔觸發）
+  const touchStartY = useRef(null)
+  const onTouchStart = (e) => {
+    document.documentElement.dataset.ts = String(Math.round(e.touches[0].clientY))
+    touchStartY.current = e.touches[0].clientY
+  }
+  const onTouchEnd = (e) => {
+    if (touchStartY.current == null) return
+    const dy = touchStartY.current - e.changedTouches[0].clientY
+    touchStartY.current = null
+    document.documentElement.dataset.te = String(Math.round(dy))
+    if (Math.abs(dy) < 60) return
+    if (dy > 0) goNext()
+    else goPrev()
+  }
+
   // 反向同步：行到有 beatId 錨點嘅頁時，左欄自動跳去對應小節
   // （例：K1 行到第 5 頁「冪」，高亮就由「整除性檢驗」跳去「冪的概念」）
   useEffect(() => {
@@ -127,7 +143,11 @@ export default function App() {
         open={menuOpen}
       />
 
-      <main className="relative flex h-full w-full flex-col md:w-3/4">
+      <main
+        className="relative flex h-full w-full flex-col md:w-3/4"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
         {/* 1 · 頂部進度條（螢光藍，極細） */}
         <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-[3px] bg-white/[0.05]">
           <div
@@ -136,11 +156,11 @@ export default function App() {
           />
         </div>
 
-        {/* 4 · 手機版漢堡選單 */}
+        {/* 4 · 手機版漢堡選單（避開劉海安全區） */}
         <button
           onClick={() => setMenuOpen((o) => !o)}
           aria-label="開啟課程選單"
-          className="absolute left-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-black/60 text-zinc-200 backdrop-blur transition-colors hover:bg-white/10 md:hidden"
+          className="absolute left-4 top-[max(1rem,env(safe-area-inset-top))] z-20 flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-black/60 text-zinc-200 backdrop-blur transition-colors hover:bg-white/10 md:hidden"
         >
           <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
             <path d="M3 5.5h14M3 10h14M3 14.5h14" />
