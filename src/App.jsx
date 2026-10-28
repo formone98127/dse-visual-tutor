@@ -11,6 +11,27 @@ export default function App() {
   const [currentStep, setCurrentStep] = useState(0) // 而家上到邊一個 beat
   const [stageInBeat, setStageInBeat] = useState(0) // 呢一頁入面揭到第幾段
   const [menuOpen, setMenuOpen] = useState(false) // 手機版抽屜選單
+  const [zoom, setZoom] = useState(() => {
+    // 舞台縮放（字體＋圖畫一齊等比），0.7–1.4，記住上次揀嘅
+    try {
+      const v = parseFloat(localStorage.getItem('dse-vt-stage-zoom'))
+      return v >= 0.7 && v <= 1.4 ? v : 1
+    } catch {
+      return 1
+    }
+  })
+
+  const nudgeZoom = useCallback((d) => {
+    setZoom((z) => Math.min(1.4, Math.max(0.7, Math.round((z + d) * 10) / 10)))
+  }, [])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('dse-vt-stage-zoom', String(zoom))
+    } catch {
+      /* 寫唔入就算 */
+    }
+  }, [zoom])
 
   const lessons = LESSONS_BY_MODE[mode]
   const syllabus = SYLLABUS[mode]
@@ -172,6 +193,10 @@ export default function App() {
           lesson={lesson}
           beat={beat}
           stage={stageInBeat}
+          zoom={zoom}
+          index={currentStep}
+          total={total}
+          steps={beatSteps}
           unitTitle={activeUnit?.title ?? null}
           pendingTitle={activeUnit && !lesson ? activeUnit.title : null}
         />
@@ -181,6 +206,8 @@ export default function App() {
           total={total}
           stage={stageInBeat}
           steps={beatSteps}
+          zoom={zoom}
+          onZoom={nudgeZoom}
           onPrev={goPrev}
           onNext={goNext}
         />

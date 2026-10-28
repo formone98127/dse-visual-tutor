@@ -138,7 +138,7 @@ export const k2Script = [
   { id: 11, text: '第二章完成——有向數係代數嘅地基，下一章：K3 近似值與數值估計。', action: 'summary' },
 ]
 
-const K2_STEPS = [7, 6, 6, 6, 5, 5, 5, 5, 5, 5, 6]
+const K2_STEPS = [7, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]
 
 const k2Directed = {
   id: 'k2-directed',

@@ -1,7 +1,3 @@
-function pad(n) {
-  return String(n).padStart(2, '0')
-}
-
 /** 開頭階段詞 → badge 顏色 class（題目 / 已知條件 / 問咩 / 點解 / 驗證 / 到你） */
 const BEAT_TAGS = [
   [/^(題目|單元)/, 'tag-q'],
@@ -26,38 +22,35 @@ function splitBeatTag(caption) {
 /**
  * ControlDeck — 下半部 30%：字幕 + Prev/Next 控制台。
  */
-export default function ControlDeck({ beat, index, total, stage = 0, steps = 1, onPrev, onNext }) {
+export default function ControlDeck({ beat, index, total, stage = 0, steps = 1, zoom = 1, onZoom, onPrev, onNext }) {
   const atStart = index <= 0
   const atEnd = index >= total - 1 && stage >= steps - 1 // 最後一頁都要揭晒先算完
   const parsed = beat ? splitBeatTag(beat.caption) : null
 
   return (
     <section className="relative flex h-[30%] w-full flex-col border-t border-white/[0.08] bg-[#15151a]">
-      {/* 坐喺分隔橫綫上：滑動提示(手機) / 快速鍵(桌面) + 頁內圓點 + 步數
-          （-translate-y-1/2 跨騎條綫；漸層底上半黑=Theater、下半深灰=Deck，接合無縫） */}
-      {total > 0 && (
-        <div className="absolute right-4 top-0 z-10 flex -translate-y-1/2 items-center gap-2.5 rounded-full border border-white/10 bg-gradient-to-b from-black to-[#15151a] px-3.5 py-1 md:right-8">
-          <span className="text-[10px] tracking-[0.15em] text-zinc-600 md:hidden">
-            滑動 ↑↓
+      {/* 坐喺分隔橫綫左邊：舞台縮放（字體＋圖畫一齊等比，0.7–1.4 倍） */}
+      {onZoom && (
+        <div className="absolute left-4 top-0 z-10 flex -translate-y-1/2 items-center gap-1.5 rounded-full border border-white/10 bg-gradient-to-b from-black to-[#15151a] px-2.5 py-1 md:left-8">
+          <button
+            onClick={() => onZoom(-0.1)}
+            disabled={zoom <= 0.7}
+            aria-label="縮細舞台"
+            className="h-6 w-6 rounded-full text-[11px] font-bold leading-none text-zinc-400 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-25 disabled:hover:bg-transparent"
+          >
+            A−
+          </button>
+          <span className="w-9 text-center font-mono text-[10px] text-zinc-500">
+            {Math.round(zoom * 100)}%
           </span>
-          <span className="hidden text-[10px] tracking-[0.15em] text-zinc-600 md:inline">
-            快速鍵 ↑↓
-          </span>
-          {steps > 1 && (
-            <span className="flex items-center gap-1">
-              {Array.from({ length: steps }).map((_, i) => (
-                <span
-                  key={i}
-                  className={`h-1.5 w-1.5 rounded-full transition-colors duration-300 ${
-                    i <= stage ? 'bg-amber-400' : 'bg-white/15'
-                  }`}
-                />
-              ))}
-            </span>
-          )}
-          <span className="font-mono text-[11px] tracking-[0.25em] text-zinc-500">
-            {pad(index + 1)} / {pad(total)}
-          </span>
+          <button
+            onClick={() => onZoom(0.1)}
+            disabled={zoom >= 1.4}
+            aria-label="放大舞台"
+            className="h-6 w-6 rounded-full text-[11px] font-bold leading-none text-zinc-400 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-25 disabled:hover:bg-transparent"
+          >
+            A＋
+          </button>
         </div>
       )}
 

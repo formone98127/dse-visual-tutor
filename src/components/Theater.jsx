@@ -60,7 +60,11 @@ function Placeholder({ pendingTitle, mode }) {
   )
 }
 
-export default function Theater({ mode, lesson, beat, pendingTitle, unitTitle, stage }) {
+function pad(n) {
+  return String(n).padStart(2, '0')
+}
+
+export default function Theater({ mode, lesson, beat, pendingTitle, unitTitle, stage, zoom = 1, index = 0, total = 0, steps = 1 }) {
   const { snap, visible } = useStageSnapshot({ beat, lesson, pendingTitle, mode })
   const Lab = snap.lesson ? LABS[snap.lesson.lab] : null
   const playing = snap.lesson && snap.beat && Lab
@@ -78,12 +82,12 @@ export default function Theater({ mode, lesson, beat, pendingTitle, unitTitle, s
       {/* 極淡的數學格線 */}
       <div className="stage-grid pointer-events-none absolute inset-0" />
 
-      {/* 觀景窗四角（左上角手機版收起，俾位漢堡選單） */}
+      {/* 觀景窗四角（左上角手機版收起俾漢堡選單；右下角上課時收起俾資訊列） */}
       {[
         'top-6 left-6 border-t border-l hidden md:block',
         'top-6 right-6 border-t border-r',
         'bottom-6 left-6 border-b border-l',
-        'bottom-6 right-6 border-b border-r',
+        ...(total > 0 ? [] : ['bottom-6 right-6 border-b border-r']),
       ].map((pos) => (
         <span
           key={pos}
@@ -111,12 +115,43 @@ export default function Theater({ mode, lesson, beat, pendingTitle, unitTitle, s
       >
         {playing ? (
           <div className="flex h-full items-center justify-center">
-            <Lab key={snap.beat.id} mode={snap.beat.mode} stage={stage} />
+            {/* 用戶自調舞台縮放（字體＋圖畫一齊等比）；zoom 唔入 snapshot，縮放唔會觸發交叉淡化 */}
+            <div style={{ transform: `scale(${zoom})`, transition: 'transform 0.2s ease' }}>
+              <Lab key={snap.beat.id} mode={snap.beat.mode} stage={stage} />
+            </div>
           </div>
         ) : (
           <Placeholder pendingTitle={snap.pendingTitle} mode={snap.mode} />
         )}
       </div>
+
+      {/* 右下角資訊列：滑動提示(手機) / 快速鍵(桌面) + 頁內圓點 + 頁數
+          —— 放入舞台範圍，唔跟內容淡化；右下角觀景窗標記讓位俾佢 */}
+      {total > 0 && (
+        <div className="absolute bottom-4 right-4 z-10 flex items-center gap-2.5 rounded-full border border-white/10 bg-black/60 px-3.5 py-1 backdrop-blur md:bottom-6 md:right-8">
+          <span className="text-[10px] tracking-[0.15em] text-zinc-600 md:hidden">
+            滑動 ↑↓
+          </span>
+          <span className="hidden text-[10px] tracking-[0.15em] text-zinc-600 md:inline">
+            快速鍵 ↑↓
+          </span>
+          {steps > 1 && (
+            <span className="flex items-center gap-1">
+              {Array.from({ length: steps }).map((_, i) => (
+                <span
+                  key={i}
+                  className={`h-1.5 w-1.5 rounded-full transition-colors duration-300 ${
+                    i <= stage ? 'bg-amber-400' : 'bg-white/15'
+                  }`}
+                />
+              ))}
+            </span>
+          )}
+          <span className="font-mono text-[11px] tracking-[0.25em] text-zinc-500">
+            {pad(index + 1)} / {pad(total)}
+          </span>
+        </div>
+      )}
     </section>
   )
 }

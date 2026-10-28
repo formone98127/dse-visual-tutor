@@ -87,7 +87,7 @@ export default function DirectedLab({ mode, stage = 99 }) {
   /* ---- 1 · 有向數概念 ---- */
   if (mode === 'number_line') {
     return (
-      <Stage title="有向數 · 數線" stage={stage} ds={4}
+      <Stage title="有向數 · 數線" stage={stage} ds={3}
         lines={[
           [{ t: '正數：大過 0，向右行　（例：+5）', fill: BLUE }],
           [{ t: '負數：細過 0，向左行　（例：−3）', fill: RED }],
@@ -112,7 +112,7 @@ export default function DirectedLab({ mode, stage = 99 }) {
   /* ---- 2 · 相反數 ---- */
   if (mode === 'opposite') {
     return (
-      <Stage title="相反數 · +5 同 −5" stage={stage} ds={3}
+      <Stage title="相反數 · +5 同 −5" stage={stage} ds={2}
         lines={[
           [{ t: '+5 同 −5 隔住 0 對望，距離一樣 — 互為相反數' }],
           [{ t: '負負得正：−(−7) = 7', fill: GOLD, b: true }],
@@ -133,7 +133,7 @@ export default function DirectedLab({ mode, stage = 99 }) {
   /* ---- 3 · 加正數：向右 ---- */
   if (mode === 'add_pos') {
     return (
-      <Stage title="加正數 · (−2) + 5" stage={stage} ds={3}
+      <Stage title="加正數 · (−2) + 5" stage={stage} ds={2}
         lines={[
           [{ t: '由 −2 出發，向右行 5 格：−1 → 0 → 1 → 2 → 3' }],
           [{ t: '(−2) + 5 = ' }, { t: '+3', fill: GOLD, b: true }],
@@ -157,7 +157,7 @@ export default function DirectedLab({ mode, stage = 99 }) {
   /* ---- 4 · 加負數：向左 ---- */
   if (mode === 'add_neg') {
     return (
-      <Stage title="加負數 · (+3) + (−4)" stage={stage} ds={3}
+      <Stage title="加負數 · (+3) + (−4)" stage={stage} ds={2}
         lines={[
           [{ t: '由 +3 出發，向左行 4 格：2 → 1 → 0 → −1' }],
           [{ t: '(+3) + (−4) = ' }, { t: '−1', fill: GOLD, b: true }],
@@ -181,7 +181,7 @@ export default function DirectedLab({ mode, stage = 99 }) {
   /* ---- 5 · 減 = 加相反數 ---- */
   if (mode === 'subtract') {
     return (
-      <Stage title="減法秘技 · 減 = 加相反數" stage={stage} ds={3}
+      <Stage title="減法秘技 · 減 = 加相反數" stage={stage} ds={2}
         lines={[
           [{ t: '2 − (−3) 唔好死諗——減一個負數，即係加佢嘅相反數' }],
           [{ t: '2 − (−3) = 2 + (+3) = ' }, { t: '5', fill: GOLD, b: true }],
@@ -211,7 +211,7 @@ export default function DirectedLab({ mode, stage = 99 }) {
       ['(−) × (−)', '+', OK, 225, 190],
     ]
     return (
-      <Stage title="乘法 · 同號得正，異號得負" stage={stage} ds={3}
+      <Stage title="乘法 · 同號得正，異號得負" stage={stage} ds={2}
         lines={[
           [{ t: '(−3) × (−4)：負 × 負 → 同號 → 得正' }],
           [{ t: '(−3) × (−4) = ' }, { t: '+12', fill: GOLD, b: true }],
@@ -222,12 +222,16 @@ export default function DirectedLab({ mode, stage = 99 }) {
           {RULES.map(([t, sign, c, x, y], i) => (
             <g key={i}>
               <rect x={x} y={y} width={165} height={56} rx={12} fill="rgba(255,255,255,0.05)" stroke={LINE} strokeWidth={1.5} />
-              <Text x={x + 82} y={y} size={19} vb>{t}</Text>
-              <Text x={x + 82} y={y + 40} size={22} fill={c} w={700} vb>{`= ${sign}`}</Text>
+              <Text x={x + 82} y={y + 14} size={19} vb>{t}</Text>
+              <Text x={x + 82} y={y + 42} size={22} fill={c} w={700} vb>{`= ${sign}`}</Text>
             </g>
           ))}
         </g>
+        {/* 聚焦同號例子：(−)×(−) 卡亮金框 */}
         <g opacity={on(1, stage)}>
+          <rect x={225} y={190} width={165} height={56} rx={12} fill="rgba(251,191,36,0.10)" stroke={GOLD} strokeWidth={2.2} />
+        </g>
+        <g opacity={on(2, stage)}>
           <Text x={215} y={296} size={22} fill={GOLD} w={700}>例：(−3) × (−4) = +12</Text>
         </g>
       </Stage>
@@ -237,7 +241,7 @@ export default function DirectedLab({ mode, stage = 99 }) {
   /* ---- 7 · 除法 ---- */
   if (mode === 'divide') {
     return (
-      <Stage title="除法 · 符號法則同乘法一樣" stage={stage} ds={3}
+      <Stage title="除法 · 符號法則同乘法一樣" stage={stage} ds={2}
         lines={[
           [{ t: '同號相除得正：(−12) ÷ (−4) = ' }, { t: '+3', fill: GOLD, b: true }],
           [{ t: '異號相除得負：12 ÷ (−4) = ' }, { t: '−3', fill: GOLD, b: true }],
@@ -264,7 +268,7 @@ export default function DirectedLab({ mode, stage = 99 }) {
   /* ---- 8 · 混合運算 ---- */
   if (mode === 'mixed_ops') {
     return (
-      <Stage title="混合運算 · 先乘除後加減" stage={stage} ds={3}
+      <Stage title="混合運算 · 先乘除後加減" stage={stage} ds={2}
         lines={[
           [{ t: '原式：(−2) + 3 × (−4)' }],
           [{ t: '先乘：3 × (−4) = −12 → (−2) + (−12)' }],
@@ -287,7 +291,7 @@ export default function DirectedLab({ mode, stage = 99 }) {
   /* ---- 9 · 應用：氣溫 ---- */
   if (mode === 'real_life') {
     return (
-      <Stage title="應用 · 氣溫變化" stage={stage} ds={3}
+      <Stage title="應用 · 氣溫變化" stage={stage} ds={2}
         lines={[
           [{ t: '昨晚 −5°C，今早升咗 8°C' }],
           [{ t: '(−5) + 8 = ' }, { t: '+3', fill: GOLD, b: true }, { t: '　→ 今早 +3°C', fill: MUTED }],
@@ -320,7 +324,7 @@ export default function DirectedLab({ mode, stage = 99 }) {
       </g>
     )
     return (
-      <Stage title="常犯錯誤 · 千祈唔好中招" stage={stage} ds={3}
+      <Stage title="常犯錯誤 · 千祈唔好中招" stage={stage} ds={2}
         lines={[
           [{ t: '錯誤 1：−3 + 5 唔係 −8 —— 5 大過 3，跟 5 嘅正號 → +2' }],
           [{ t: '錯誤 2：(−2)² = (−2) × (−2) = +4，唔係 −4' }],
