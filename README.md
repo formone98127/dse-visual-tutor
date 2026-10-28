@@ -1,4 +1,4 @@
-# DSE Visual Tutor · 視覺補習社
+# DSE Visual Tutor · DSE網上課程
 
 香港 DSE 數學網上學習平台 — 每一頁逐行推演、每一步由學生自己揭開。
 

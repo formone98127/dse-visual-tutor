@@ -185,7 +185,7 @@ export default function Sidebar({ mode, onChangeMode, activeUnitId, onSelectUnit
       </section>
 
       <footer className="border-t border-white/[0.06] px-7 py-4">
-        <p className="text-[11px] text-zinc-600">視覺補習社 · MVP v0.1</p>
+        <p className="text-[11px] text-zinc-600">DSE網上課程 · MVP v0.1</p>
       </footer>
     </aside>
   )
