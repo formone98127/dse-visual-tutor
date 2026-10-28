@@ -6,8 +6,8 @@ import { LESSONS_BY_MODE } from './data/lessons.js'
 import { SYLLABUS, defaultUnitId } from './data/syllabus.js'
 
 export default function App() {
-  const [mode, setMode] = useState('DSE') // 'PRE_DSE' | 'DSE'
-  const [activeUnitId, setActiveUnitId] = useState(() => defaultUnitId('DSE'))
+  const [mode, setMode] = useState('PRE_DSE') // 'PRE_DSE' | 'DSE'
+  const [activeUnitId, setActiveUnitId] = useState(() => defaultUnitId('PRE_DSE'))
   const [currentStep, setCurrentStep] = useState(0) // 而家上到邊一個 beat
   const [stageInBeat, setStageInBeat] = useState(0) // 呢一頁入面揭到第幾段
   const [menuOpen, setMenuOpen] = useState(false) // 手機版抽屜選單
