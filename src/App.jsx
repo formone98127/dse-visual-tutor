@@ -121,16 +121,15 @@ export default function App() {
   }, [goNext, goPrev])
 
   // 手機滑動：向上滑 = 下一步，向下滑 = 上一步（淨係認垂直方向，斜側唔觸發）
+  // 放大（zoom > 1）時暫停滑動翻頁——滑動改為睇放大內容
   const touchStartY = useRef(null)
   const onTouchStart = (e) => {
-    document.documentElement.dataset.ts = String(Math.round(e.touches[0].clientY))
     touchStartY.current = e.touches[0].clientY
   }
   const onTouchEnd = (e) => {
-    if (touchStartY.current == null) return
+    if (touchStartY.current == null || zoom > 1) return
     const dy = touchStartY.current - e.changedTouches[0].clientY
     touchStartY.current = null
-    document.documentElement.dataset.te = String(Math.round(dy))
     if (Math.abs(dy) < 60) return
     if (dy > 0) goNext()
     else goPrev()

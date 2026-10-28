@@ -114,9 +114,10 @@ export default function Theater({ mode, lesson, beat, pendingTitle, unitTitle, s
         }`}
       >
         {playing ? (
-          <div className="flex h-full items-center justify-center">
-            {/* 用戶自調舞台縮放（字體＋圖畫一齊等比）；zoom 唔入 snapshot，縮放唔會觸發交叉淡化 */}
-            <div style={{ transform: `scale(${zoom})`, transition: 'transform 0.2s ease' }}>
+          /* 縮放用真實布局闊度（唔係 transform scale）——放大後內容溢出時
+             容器變成可捲動，拖曳/滑動都睇到每一角，文字唔會飛出屏幕 */
+          <div className="h-full w-full overflow-auto">
+            <div className="m-auto" style={{ width: `${zoom * 100}%` }}>
               <Lab key={snap.beat.id} mode={snap.beat.mode} stage={stage} />
             </div>
           </div>

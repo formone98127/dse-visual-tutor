@@ -23,9 +23,6 @@ body {
   .idx-lab {
     width: 100%;
   }
-  .idx-lab .vm-svg {
-    max-height: 40vh;
-  }
 }
 
 body {
@@ -54,9 +51,6 @@ body {
 .vm-svg {
   width: 100%;
   overflow: visible;
-}
-.idx-lab .vm-svg {
-  max-height: min(60vh, 560px);
 }
 .idx-chip {
   cursor: pointer;
