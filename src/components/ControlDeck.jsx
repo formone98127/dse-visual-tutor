@@ -33,34 +33,33 @@ export default function ControlDeck({ beat, index, total, stage = 0, steps = 1, 
 
   return (
     <section className="relative flex h-[30%] w-full flex-col border-t border-white/[0.08] bg-[#15151a]">
-      {/* 右上角：滑動提示(手機) / 快速鍵(桌面) + 頁內圓點 + 步數 */}
-      <div className="absolute right-4 top-4 flex items-center gap-3 md:right-8 md:top-5">
-        {total > 0 && (
-          <>
-            <span className="text-[10px] tracking-[0.15em] text-zinc-600 md:hidden">
-              滑動 ↑↓
+      {/* 坐喺分隔橫綫上：滑動提示(手機) / 快速鍵(桌面) + 頁內圓點 + 步數
+          （-translate-y-1/2 跨騎條綫；漸層底上半黑=Theater、下半深灰=Deck，接合無縫） */}
+      {total > 0 && (
+        <div className="absolute right-4 top-0 z-10 flex -translate-y-1/2 items-center gap-2.5 rounded-full border border-white/10 bg-gradient-to-b from-black to-[#15151a] px-3.5 py-1 md:right-8">
+          <span className="text-[10px] tracking-[0.15em] text-zinc-600 md:hidden">
+            滑動 ↑↓
+          </span>
+          <span className="hidden text-[10px] tracking-[0.15em] text-zinc-600 md:inline">
+            快速鍵 ↑↓
+          </span>
+          {steps > 1 && (
+            <span className="flex items-center gap-1">
+              {Array.from({ length: steps }).map((_, i) => (
+                <span
+                  key={i}
+                  className={`h-1.5 w-1.5 rounded-full transition-colors duration-300 ${
+                    i <= stage ? 'bg-amber-400' : 'bg-white/15'
+                  }`}
+                />
+              ))}
             </span>
-            <span className="hidden text-[10px] tracking-[0.15em] text-zinc-600 md:inline">
-              快速鍵 ↑↓
-            </span>
-            {steps > 1 && (
-              <span className="flex items-center gap-1">
-                {Array.from({ length: steps }).map((_, i) => (
-                  <span
-                    key={i}
-                    className={`h-1.5 w-1.5 rounded-full transition-colors duration-300 ${
-                      i <= stage ? 'bg-amber-400' : 'bg-white/15'
-                    }`}
-                  />
-                ))}
-              </span>
-            )}
-            <span className="font-mono text-[11px] tracking-[0.25em] text-zinc-500">
-              {pad(index + 1)} / {pad(total)}
-            </span>
-          </>
-        )}
-      </div>
+          )}
+          <span className="font-mono text-[11px] tracking-[0.25em] text-zinc-500">
+            {pad(index + 1)} / {pad(total)}
+          </span>
+        </div>
+      )}
 
       {/* 字幕區 */}
       <div className="flex flex-1 items-center justify-center px-6 text-center md:px-16">

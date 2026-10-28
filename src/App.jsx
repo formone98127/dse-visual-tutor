@@ -172,6 +172,7 @@ export default function App() {
           lesson={lesson}
           beat={beat}
           stage={stageInBeat}
+          unitTitle={activeUnit?.title ?? null}
           pendingTitle={activeUnit && !lesson ? activeUnit.title : null}
         />
         <ControlDeck

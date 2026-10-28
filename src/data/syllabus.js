@@ -55,8 +55,8 @@ export const SYLLABUS = {
       id: 'k5', code: 'K5', title: '百分數的應用', en: 'Using percentages',
       strand: '數與代數', hours: 15,
       units: [
-        { id: 'k5-changes', title: '百分數變化' },
-        { id: 'k5-life', title: '盈利虧損利息應用' },
+        { id: 'k5-changes', title: '百分數變化', lessonId: 'k5-percent', beatId: 's1' },
+        { id: 'k5-life', title: '盈利虧損利息應用', lessonId: 'k5-percent', beatId: 's5' },
       ],
     },
     {

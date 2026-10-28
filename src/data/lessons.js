@@ -197,6 +197,31 @@ const k4Rational = {
   beats: k4Script.map((s, i) => ({ id: `s${s.id}`, caption: s.text, mode: s.action, steps: K4_STEPS[i] })),
 }
 
+/** K5 百分數的應用 — 第五章課程脚本 */
+export const k5Script = [
+  { id: 1, text: '第五章：百分數的應用。核心公式一條：百分比變化 =（新 − 舊）÷ 舊 × 100%。', action: 'pct_concept' },
+  { id: 2, text: '百分比增加：$200 升到 $260——(260−200) ÷ 200 = +30%。', action: 'pct_increase' },
+  { id: 3, text: '百分比減少：$250 跌到 $200——(200−250) ÷ 250 = −20%。基數係「舊值」。', action: 'pct_decrease' },
+  { id: 4, text: '大陷阱：升 20% 再跌 20%，唔係返返原價——200 → 240 → 192，實際蝕咗！', action: 'pct_tricky' },
+  { id: 5, text: '盈利：成本 $800、售價 $1,000——盈利 $200，盈利百分數以「成本」做基數 = 25%。', action: 'profit' },
+  { id: 6, text: '折扣：標價 $400 打 8 折——400 × 80% = $320，即係減 $80（20% off）。', action: 'discount' },
+  { id: 7, text: '單利息：I = P × r% × t——$10,000 年利率 5% 存 2 年，利息 $1,000，本利和 $11,000。', action: 'interest' },
+  { id: 8, text: '綜合應用：手機 $3,000 減 15%——3,000 × 85% = $2,550，一行搞掂。', action: 'real_life' },
+  { id: 9, text: '兩大陷阱：升跌唔對稱；盈利百分數嘅基數係成本唔係售價。', action: 'mistakes' },
+  { id: 10, text: '第五章完成——百分數係現實生活最常用嘅數學，下一章：K6 率、比與比例。', action: 'summary' },
+]
+
+const K5_STEPS = [5, 6, 6, 7, 6, 6, 6, 6, 5, 6]
+
+const k5Percent = {
+  id: 'k5-percent',
+  mode: 'PRE_DSE',
+  title: 'K5 百分數的應用',
+  subtitle: '百分比變化 · 盈利 · 折扣 · 單利息 · 應用',
+  lab: 'percent',
+  beats: k5Script.map((s, i) => ({ id: `s${s.id}`, caption: s.text, mode: s.action, steps: K5_STEPS[i] })),
+}
+
 const q18 = {
   id: 'dse-2012-p1-q18',
   mode: 'DSE',
@@ -230,6 +255,6 @@ const q18 = {
 }
 
 export const LESSONS_BY_MODE = {
-  PRE_DSE: [k1Basic, k2Directed, k3Approx, k4Rational, pythagoras],
+  PRE_DSE: [k1Basic, k2Directed, k3Approx, k4Rational, k5Percent, pythagoras],
   DSE: [q18],
 }

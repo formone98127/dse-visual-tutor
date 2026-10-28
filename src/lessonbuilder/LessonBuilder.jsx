@@ -42,6 +42,21 @@ const ACTION_GROUPS = [
     ],
   },
   {
+    label: '百分數 Lab（K5）',
+    actions: [
+      ['pct_concept', 'pct_concept — 變化公式'],
+      ['pct_increase', 'pct_increase — 增加 +30%'],
+      ['pct_decrease', 'pct_decrease — 減少 −20%'],
+      ['pct_tricky', 'pct_tricky — 升跌唔對稱陷阱'],
+      ['profit', 'profit — 盈利（基數=成本）'],
+      ['discount', 'discount — 折扣 8 折'],
+      ['interest', 'interest — 單利息'],
+      ['real_life', 'real_life — 手機減價'],
+      ['mistakes', 'mistakes — 常犯錯誤'],
+      ['summary', 'summary — 章總結'],
+    ],
+  },
+  {
     label: '有理無理 Lab（K4）',
     actions: [
       ['nth_root', 'nth_root — 根號與平方根'],

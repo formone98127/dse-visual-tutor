@@ -5,6 +5,7 @@ import BasicLab from './BasicLab.jsx'
 import DirectedLab from './DirectedLab.jsx'
 import ApproxLab from './ApproxLab.jsx'
 import RationalLab from './RationalLab.jsx'
+import PercentLab from './PercentLab.jsx'
 
 const LABS = {
   pyramid: PyramidLab,
@@ -13,6 +14,7 @@ const LABS = {
   directed: DirectedLab,
   approx: ApproxLab,
   rational: RationalLab,
+  percent: PercentLab,
 }
 
 /**
@@ -58,7 +60,7 @@ function Placeholder({ pendingTitle, mode }) {
   )
 }
 
-export default function Theater({ mode, lesson, beat, pendingTitle, stage }) {
+export default function Theater({ mode, lesson, beat, pendingTitle, unitTitle, stage }) {
   const { snap, visible } = useStageSnapshot({ beat, lesson, pendingTitle, mode })
   const Lab = snap.lesson ? LABS[snap.lesson.lab] : null
   const playing = snap.lesson && snap.beat && Lab
@@ -93,6 +95,13 @@ export default function Theater({ mode, lesson, beat, pendingTitle, stage }) {
       <span className="absolute left-16 top-4 z-10 text-[10px] font-medium uppercase tracking-[0.35em] text-zinc-600 md:left-8 md:top-7">
         Theater · {snap.lesson ? snap.lesson.title : snap.mode === 'DSE' ? '高中' : '初中'}
       </span>
+
+      {/* 右上角：小標題 · 而家上到邊一小節（同左上角對稱；手機版 right-4 唔使讓位） */}
+      {unitTitle && (
+        <span className="absolute right-4 top-4 z-10 text-right text-[10px] font-medium tracking-[0.35em] text-zinc-500 md:right-8 md:top-7">
+          {unitTitle}
+        </span>
+      )}
 
       {/* 舞台內容（淡入淡出層） */}
       <div
