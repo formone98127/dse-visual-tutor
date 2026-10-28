@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import PyramidLab from './PyramidLab.jsx'
 import PythagorasLab from './PythagorasLab.jsx'
 import BasicLab from './BasicLab.jsx'
@@ -64,13 +64,38 @@ function pad(n) {
   return String(n).padStart(2, '0')
 }
 
-export default function Theater({ mode, lesson, beat, pendingTitle, unitTitle, stage, zoom = 1, index = 0, total = 0, steps = 1 }) {
+export default function Theater({ mode, lesson, beat, pendingTitle, unitTitle, stage, index = 0, total = 0, steps = 1 }) {
   const { snap, visible } = useStageSnapshot({ beat, lesson, pendingTitle, mode })
   const Lab = snap.lesson ? LABS[snap.lesson.lab] : null
   const playing = snap.lesson && snap.beat && Lab
 
+  // 自動貼合：量度舞台實際空間，計出 430×330 場景最大唔變形嘅尺寸
+  // 手機/平板/桌面/投影機全部自動，唔使用戶調較
+  const stageRef = useRef(null)
+  const [fit, setFit] = useState({ w: 430, h: 330 })
+
+  useEffect(() => {
+    const el = stageRef.current
+    if (!el) return
+    const recompute = () => {
+      const r = el.getBoundingClientRect()
+      if (r.width < 50 || r.height < 50) return
+      const pad = window.innerWidth < 768 ? 8 : 40
+      const s = Math.min((r.width - pad) / 430, (r.height - pad) / 330)
+      setFit({ w: Math.round(430 * s), h: Math.round(330 * s) })
+    }
+    recompute()
+    const ro = new ResizeObserver(recompute)
+    ro.observe(el)
+    window.addEventListener('orientationchange', recompute)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('orientationchange', recompute)
+    }
+  }, [])
+
   return (
-    <section className="relative h-[58%] w-full overflow-hidden bg-black md:h-[70%]">
+    <section ref={stageRef} className="relative h-[58%] w-full overflow-hidden bg-black md:h-[70%]">
       {/* 柔和的舞台燈光 */}
       <div
         className="pointer-events-none absolute inset-0"
@@ -114,10 +139,9 @@ export default function Theater({ mode, lesson, beat, pendingTitle, unitTitle, s
         }`}
       >
         {playing ? (
-          /* 縮放用真實布局闊度（唔係 transform scale）——放大後內容溢出時
-             容器變成可捲動，拖曳/滑動都睇到每一角，文字唔會飛出屏幕 */
-          <div className="h-full w-full overflow-auto">
-            <div className="m-auto" style={{ width: `${zoom * 100}%` }}>
+          /* 自動貼合尺寸：wrapper 尺寸由 ResizeObserver 計算，svg 填滿唔變形 */
+          <div className="flex h-full w-full items-center justify-center p-2 md:p-5">
+            <div className="shrink-0" style={{ width: fit.w, height: fit.h }}>
               <Lab key={snap.beat.id} mode={snap.beat.mode} stage={stage} />
             </div>
           </div>
