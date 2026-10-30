@@ -14,11 +14,16 @@ function sceneKey(mode) {
   return i < 0 ? mode : mode.slice(i + 1)
 }
 
-/* ---- 共用座標：x ∈ [-4,4] → [40,390]；y 向上為正，螢幕向下 ---- */
+/* ---- 共用座標（diag 430×290）----
+ * 頂帶 0–40：方程／狀態字（避開 LabStage 金色標題）
+ * 圖帶 45–215：座標軸＋拋物線
+ * 底帶 230–280：撳掣 CTA（唔同圖／根標籤打架）
+ */
 const OX = 215
-const OY = 168
-const SX = 42
-const SY = 18
+const OY = 145
+const SX = 40
+const SY = 13
+const CTA_Y = 242
 
 function toX(x) {
   return OX + x * SX
@@ -45,16 +50,16 @@ function Axes({ showY = true }) {
       <line x1={382} y1={OY + 5} x2={390} y2={OY} stroke={LINE} strokeWidth={1.4} />
       {showY && (
         <>
-          <line x1={OX} y1={40} x2={OX} y2={250} stroke={LINE} strokeWidth={1.4} />
-          <line x1={OX - 5} y1={48} x2={OX} y2={40} stroke={LINE} strokeWidth={1.4} />
-          <line x1={OX + 5} y1={48} x2={OX} y2={40} stroke={LINE} strokeWidth={1.4} />
+          <line x1={OX} y1={48} x2={OX} y2={215} stroke={LINE} strokeWidth={1.4} />
+          <line x1={OX - 5} y1={56} x2={OX} y2={48} stroke={LINE} strokeWidth={1.4} />
+          <line x1={OX + 5} y1={56} x2={OX} y2={48} stroke={LINE} strokeWidth={1.4} />
         </>
       )}
-      <text x={398} y={OY + 14} fontSize={12} fill={MUTED} fontFamily={SERIF}>
+      <text x={396} y={OY + 14} fontSize={12} fill={MUTED} fontFamily={SERIF}>
         x
       </text>
       {showY && (
-        <text x={OX + 8} y={36} fontSize={12} fill={MUTED} fontFamily={SERIF}>
+        <text x={OX + 8} y={44} fontSize={12} fill={MUTED} fontFamily={SERIF}>
           y
         </text>
       )}
@@ -319,67 +324,64 @@ export default function QuadraticLab({ mode, stage = 99, onInteractComplete }) {
   const formB = -3
   const formC = -2
 
+  // lines 留空：老師講解已喺 ControlDeck，避免舞台底同字幕双重疊（睇落好似錯位）
   return (
-    <LabStage title={meta.title} stage={stage} ds={0} lines={meta.lines}>
-        {scene === 'concept' && <ConceptScene u={u} />}
-        {scene === 'factor' && <FactorScene u={u} factored={factored} onFactor={onFactor} />}
-        {scene === 'complete' && (
-          <CompleteScene u={u} fitProg={fitProg} fitted={fitted} onFit={runFit} />
-        )}
-        {scene === 'formula' && <FormulaScene u={u} />}
-        {scene === 'disc' && (
-          <DiscScene
-            u={u}
-            a={discA}
-            b={discB}
-            c={discC}
-            delta={discDelta}
-            roots={discRoots}
-            played={discPlayed}
-            onPlay={runDiscDemo}
-          />
-        )}
-        {scene === 'build' && (
-          <BuildScene
-            u={u}
-            r1={r1}
-            r2={r2}
-            sum={sum}
-            prod={prod}
-            played={buildPlayed}
-            onPlay={runBuildDemo}
-          />
-        )}
-        {scene === 'coef' && <CoefScene u={u} r1={2} r2={3} />}
-        {scene === 'squares' && <SquaresScene u={u} />}
-        {scene === 'complex' && (
-          <ComplexScene
-            u={u}
-            iPow={iPow}
-            onSpin={() => setIPow((p) => Math.min(4, p + 1))}
-          />
-        )}
-        {scene === 'complex_build' && (
-          <ComplexBuildScene
-            u={u}
-            shown={conjShown}
-            onShow={() => {
-              setConjShown(true)
-              beep()
-            }}
-          />
-        )}
-        {scene === 'mistakes' && <MistakesScene u={u} />}
-        {scene === 'apply' && <ApplyScene u={u} />}
-        {scene === 'summary' && <SummaryScene u={u} />}
-      </LabStage>
+    <LabStage title={meta.title} stage={stage} ds={0} lines={[]}>
+      {scene === 'concept' && <ConceptScene u={u} />}
+      {scene === 'factor' && <FactorScene u={u} factored={factored} onFactor={onFactor} />}
+      {scene === 'complete' && (
+        <CompleteScene u={u} fitProg={fitProg} fitted={fitted} onFit={runFit} />
+      )}
+      {scene === 'formula' && <FormulaScene u={u} />}
+      {scene === 'disc' && (
+        <DiscScene
+          u={u}
+          a={discA}
+          b={discB}
+          c={discC}
+          delta={discDelta}
+          roots={discRoots}
+          played={discPlayed}
+          onPlay={runDiscDemo}
+        />
+      )}
+      {scene === 'build' && (
+        <BuildScene
+          u={u}
+          r1={r1}
+          r2={r2}
+          sum={sum}
+          prod={prod}
+          played={buildPlayed}
+          onPlay={runBuildDemo}
+        />
+      )}
+      {scene === 'coef' && <CoefScene u={u} r1={2} r2={3} />}
+      {scene === 'squares' && <SquaresScene u={u} />}
+      {scene === 'complex' && (
+        <ComplexScene u={u} iPow={iPow} onSpin={() => setIPow((p) => Math.min(4, p + 1))} />
+      )}
+      {scene === 'complex_build' && (
+        <ComplexBuildScene
+          u={u}
+          shown={conjShown}
+          onShow={() => {
+            setConjShown(true)
+            beep()
+          }}
+        />
+      )}
+      {scene === 'mistakes' && <MistakesScene u={u} />}
+      {scene === 'apply' && <ApplyScene u={u} />}
+      {scene === 'summary' && <SummaryScene u={u} />}
+    </LabStage>
   )
 }
 
 /* ===================== scenes ===================== */
 
 function ConceptScene({ u }) {
-  const path = parabolaPath(0.35, 0, -1.2)
+  const path = parabolaPath(0.28, 0, -1.5)
   return (
     <g>
       <Axes />
@@ -392,37 +394,37 @@ function ConceptScene({ u }) {
         className={u > 0.05 ? 'fx-draw' : undefined}
         pathLength={1}
       />
-      <g opacity={clamp01((u - 0.35) / 0.4)}>
-        <Chip x={48} y={48} w={88} h={52} f={BLUE} label="a ≠ 0" sub="二次項" />
-        <Chip x={152} y={48} w={88} h={52} f={GOLD} label="b" sub="一次項" />
-        <Chip x={256} y={48} w={88} h={52} f={OK} label="c" sub="常數項" />
-      </g>
       <text
         x={215}
-        y={268}
+        y={28}
         textAnchor="middle"
         fontSize={15}
         fill={MUTED}
         fontFamily={SERIF}
-        opacity={clamp01((u - 0.55) / 0.35)}
+        opacity={clamp01((u - 0.2) / 0.35)}
       >
         圖像係一條拋物線
       </text>
+      <g opacity={clamp01((u - 0.35) / 0.4)}>
+        <Chip x={48} y={198} w={100} h={36} f={BLUE} label="a ≠ 0" sub="二次項" />
+        <Chip x={165} y={198} w={100} h={36} f={GOLD} label="b" sub="一次項" />
+        <Chip x={282} y={198} w={100} h={36} f={OK} label="c" sub="常數項" />
+      </g>
     </g>
   )
 }
 
 function FactorScene({ u, factored, onFactor }) {
-  const path = parabolaPath(0.55, -2.75, 2.8)
+  const path = parabolaPath(0.4, -2, 2.1)
   return (
     <g>
       <Axes />
       <path d={path} fill="none" stroke={BLUE} strokeWidth={2.4} opacity={clamp01(u / 0.4)} />
       <text
         x={215}
-        y={52}
+        y={28}
         textAnchor="middle"
-        fontSize={20}
+        fontSize={18}
         fill={INK}
         fontFamily={SERIF}
         fontWeight={700}
@@ -432,20 +434,20 @@ function FactorScene({ u, factored, onFactor }) {
       </text>
       {factored && (
         <g className="fx-pop">
-          <text x={215} y={78} textAnchor="middle" fontSize={17} fill={GOLD} fontFamily={SERIF} fontWeight={700}>
+          <text x={215} y={52} textAnchor="middle" fontSize={16} fill={GOLD} fontFamily={SERIF} fontWeight={700}>
             (x − 2)(x − 3) = 0
           </text>
           <circle cx={toX(2)} cy={OY} r={7} fill={GOLD} fillOpacity={0.35} stroke={GOLD} strokeWidth={2} />
           <circle cx={toX(3)} cy={OY} r={7} fill={OK} fillOpacity={0.35} stroke={OK} strokeWidth={2} />
-          <text x={toX(2)} y={OY + 22} textAnchor="middle" fontSize={13} fill={GOLD} fontFamily={SERIF} fontWeight={700}>
+          <text x={toX(2)} y={OY + 20} textAnchor="middle" fontSize={13} fill={GOLD} fontFamily={SERIF} fontWeight={700}>
             2
           </text>
-          <text x={toX(3)} y={OY + 22} textAnchor="middle" fontSize={13} fill={OK} fontFamily={SERIF} fontWeight={700}>
+          <text x={toX(3)} y={OY + 20} textAnchor="middle" fontSize={13} fill={OK} fontFamily={SERIF} fontWeight={700}>
             3
           </text>
         </g>
       )}
-      <Cta x={140} y={235} w={150} h={40} label="拆因式" onClick={onFactor} done={factored} />
+      <Cta x={140} y={CTA_Y} w={150} h={38} label="拆因式" onClick={onFactor} done={factored} />
     </g>
   )
 }
@@ -459,9 +461,9 @@ function CompleteScene({ u, fitProg, fitted, onFit }) {
     <g>
       <text
         x={215}
-        y={42}
+        y={26}
         textAnchor="middle"
-        fontSize={18}
+        fontSize={17}
         fill={INK}
         fontFamily={SERIF}
         fontWeight={700}
@@ -469,12 +471,11 @@ function CompleteScene({ u, fitProg, fitted, onFit }) {
       >
         x² − 6x + 5 = 0
       </text>
-      {/* x² block */}
       <rect
-        x={90}
-        y={70}
-        width={100}
-        height={100}
+        x={70}
+        y={48}
+        width={90}
+        height={90}
         rx={4}
         fill={BLUE}
         fillOpacity={0.22}
@@ -482,15 +483,14 @@ function CompleteScene({ u, fitProg, fitted, onFit }) {
         strokeWidth={1.8}
         opacity={clamp01(u / 0.35)}
       />
-      <text x={140} y={125} textAnchor="middle" fontSize={22} fill={BLUE} fontFamily={SERIF} fontWeight={700} opacity={clamp01(u / 0.35)}>
+      <text x={115} y={100} textAnchor="middle" fontSize={20} fill={BLUE} fontFamily={SERIF} fontWeight={700} opacity={clamp01(u / 0.35)}>
         x²
       </text>
-      {/* two 3x strips */}
       <rect
-        x={198}
-        y={70}
-        width={48}
-        height={100}
+        x={168}
+        y={48}
+        width={42}
+        height={90}
         rx={4}
         fill={GOLD}
         fillOpacity={0.25}
@@ -498,14 +498,14 @@ function CompleteScene({ u, fitProg, fitted, onFit }) {
         strokeWidth={1.8}
         opacity={clamp01((u - 0.15) / 0.35)}
       />
-      <text x={222} y={125} textAnchor="middle" fontSize={14} fill={GOLD} fontFamily={SERIF} fontWeight={700} opacity={clamp01((u - 0.15) / 0.35)}>
+      <text x={189} y={100} textAnchor="middle" fontSize={13} fill={GOLD} fontFamily={SERIF} fontWeight={700} opacity={clamp01((u - 0.15) / 0.35)}>
         3x
       </text>
       <rect
-        x={90}
-        y={178}
-        width={100}
-        height={36}
+        x={70}
+        y={146}
+        width={90}
+        height={32}
         rx={4}
         fill={GOLD}
         fillOpacity={0.25}
@@ -513,15 +513,14 @@ function CompleteScene({ u, fitProg, fitted, onFit }) {
         strokeWidth={1.8}
         opacity={clamp01((u - 0.2) / 0.35)}
       />
-      <text x={140} y={202} textAnchor="middle" fontSize={14} fill={GOLD} fontFamily={SERIF} fontWeight={700} opacity={clamp01((u - 0.2) / 0.35)}>
+      <text x={115} y={168} textAnchor="middle" fontSize={13} fill={GOLD} fontFamily={SERIF} fontWeight={700} opacity={clamp01((u - 0.2) / 0.35)}>
         3x
       </text>
-      {/* missing 9 square flies in */}
       <rect
-        x={198}
-        y={178}
-        width={48}
-        height={36}
+        x={168}
+        y={146}
+        width={42}
+        height={32}
         rx={4}
         fill={OK}
         fillOpacity={0.35}
@@ -530,12 +529,12 @@ function CompleteScene({ u, fitProg, fitted, onFit }) {
         opacity={patchOp}
         className={patchOp > 0.1 ? 'fx-pop' : undefined}
       />
-      <text x={222} y={202} textAnchor="middle" fontSize={14} fill={OK} fontFamily={SERIF} fontWeight={700} opacity={patchOp}>
+      <text x={189} y={168} textAnchor="middle" fontSize={13} fill={OK} fontFamily={SERIF} fontWeight={700} opacity={patchOp}>
         9
       </text>
       <text
-        x={300}
-        y={120}
+        x={310}
+        y={100}
         textAnchor="middle"
         fontSize={16}
         fill={GOLD}
@@ -546,10 +545,10 @@ function CompleteScene({ u, fitProg, fitted, onFit }) {
         (x − 3)² = 4
       </text>
       <text
-        x={300}
-        y={150}
+        x={310}
+        y={130}
         textAnchor="middle"
-        fontSize={18}
+        fontSize={17}
         fill={OK}
         fontFamily={SERIF}
         fontWeight={700}
@@ -557,27 +556,27 @@ function CompleteScene({ u, fitProg, fitted, onFit }) {
       >
         x = 5 或 1
       </text>
-      <Cta x={255} y={230} w={140} h={40} label="自動貼合" onClick={onFit} done={fitted && t >= 1} />
+      <Cta x={145} y={CTA_Y} w={140} h={38} label="自動貼合" onClick={onFit} done={fitted && t >= 1} />
     </g>
   )
 }
 
 function FormulaScene({ u }) {
   // 形狀對應根 −0.5 同 2（同例題 2x²−3x−2=0）
-  const path2 = parabolaPath(0.4, -0.6, -0.4)
+  const path2 = parabolaPath(0.32, -0.48, -0.32)
   const showRoots = clamp01((u - 0.45) / 0.4)
   return (
     <g>
       <Axes />
       <path d={path2} fill="none" stroke={BLUE} strokeWidth={2.4} opacity={clamp01(u / 0.4)} />
-      <text x={215} y={48} textAnchor="middle" fontSize={17} fill={INK} fontFamily={SERIF} fontWeight={700} opacity={clamp01(u / 0.3)}>
+      <text x={215} y={26} textAnchor="middle" fontSize={16} fill={INK} fontFamily={SERIF} fontWeight={700} opacity={clamp01(u / 0.3)}>
         2x² − 3x − 2 = 0
       </text>
       <text
         x={215}
-        y={72}
+        y={48}
         textAnchor="middle"
-        fontSize={13}
+        fontSize={12}
         fill={MUTED}
         fontFamily={SERIF}
         opacity={clamp01((u - 0.2) / 0.3)}
@@ -587,16 +586,16 @@ function FormulaScene({ u }) {
       <g opacity={showRoots}>
         <circle cx={toX(-0.5)} cy={OY} r={7} fill={GOLD} fillOpacity={0.35} stroke={GOLD} strokeWidth={2} className="fx-pop" />
         <circle cx={toX(2)} cy={OY} r={7} fill={OK} fillOpacity={0.35} stroke={OK} strokeWidth={2} className="fx-pop" />
-        <text x={toX(-0.5)} y={OY + 22} textAnchor="middle" fontSize={13} fill={GOLD} fontFamily={SERIF} fontWeight={700}>
+        <text x={toX(-0.5)} y={OY + 20} textAnchor="middle" fontSize={13} fill={GOLD} fontFamily={SERIF} fontWeight={700}>
           −1/2
         </text>
-        <text x={toX(2)} y={OY + 22} textAnchor="middle" fontSize={13} fill={OK} fontFamily={SERIF} fontWeight={700}>
+        <text x={toX(2)} y={OY + 20} textAnchor="middle" fontSize={13} fill={OK} fontFamily={SERIF} fontWeight={700}>
           2
         </text>
       </g>
       <text
         x={215}
-        y={268}
+        y={215}
         textAnchor="middle"
         fontSize={15}
         fill={GOLD}
@@ -611,7 +610,7 @@ function FormulaScene({ u }) {
 }
 
 function DiscScene({ u, a, b, c, delta, roots, played, onPlay }) {
-  const path = parabolaPath(a * 0.55, b * 0.55, c * 0.55)
+  const path = parabolaPath(a * 0.4, b * 0.4, c * 0.4)
   const label =
     delta > 0.15 ? 'Δ > 0 · 兩個交點' : delta < -0.15 ? 'Δ < 0 · 無交點' : 'Δ = 0 · 相切（重根）'
   const color = delta > 0.15 ? OK : delta < -0.15 ? RED : GOLD
@@ -631,19 +630,19 @@ function DiscScene({ u, a, b, c, delta, roots, played, onPlay }) {
           strokeWidth={2}
         />
       ))}
-      <text x={215} y={48} textAnchor="middle" fontSize={16} fill={color} fontFamily={SERIF} fontWeight={700} opacity={clamp01(u / 0.3)}>
+      <text x={215} y={26} textAnchor="middle" fontSize={15} fill={color} fontFamily={SERIF} fontWeight={700} opacity={clamp01(u / 0.3)}>
         {label}
       </text>
-      <text x={215} y={72} textAnchor="middle" fontSize={13} fill={MUTED} fontFamily={SERIF}>
+      <text x={215} y={48} textAnchor="middle" fontSize={12} fill={MUTED} fontFamily={SERIF}>
         Δ ≈ {delta.toFixed(1)}
       </text>
-      <Cta x={120} y={230} w={190} h={40} label="播放 Δ 變化" onClick={onPlay} done={played} />
+      <Cta x={120} y={CTA_Y} w={190} h={38} label="播放 Δ 變化" onClick={onPlay} done={played} />
     </g>
   )
 }
 
 function BuildScene({ u, r1, r2, sum, prod, played, onPlay }) {
-  const a = 0.45
+  const a = 0.35
   const b = -a * sum
   const c = a * prod
   const path = parabolaPath(a, b, c)
@@ -652,22 +651,22 @@ function BuildScene({ u, r1, r2, sum, prod, played, onPlay }) {
       <Axes />
       <path d={path} fill="none" stroke={BLUE} strokeWidth={2.4} opacity={clamp01(u / 0.35)} />
       <g opacity={clamp01(u / 0.3)}>
-        <circle cx={toX(r1)} cy={OY} r={10} fill={GOLD} fillOpacity={0.4} stroke={GOLD} strokeWidth={2.2} />
-        <text x={toX(r1)} y={OY - 16} textAnchor="middle" fontSize={14} fill={GOLD} fontFamily={SERIF} fontWeight={700}>
+        <circle cx={toX(r1)} cy={OY} r={9} fill={GOLD} fillOpacity={0.4} stroke={GOLD} strokeWidth={2.2} />
+        <text x={toX(r1)} y={OY - 14} textAnchor="middle" fontSize={13} fill={GOLD} fontFamily={SERIF} fontWeight={700}>
           {fmtNum(r1)}
         </text>
       </g>
       <g opacity={clamp01(u / 0.3)}>
-        <circle cx={toX(r2)} cy={OY} r={10} fill={OK} fillOpacity={0.4} stroke={OK} strokeWidth={2.2} />
-        <text x={toX(r2)} y={OY - 16} textAnchor="middle" fontSize={14} fill={OK} fontFamily={SERIF} fontWeight={700}>
+        <circle cx={toX(r2)} cy={OY} r={9} fill={OK} fillOpacity={0.4} stroke={OK} strokeWidth={2.2} />
+        <text x={toX(r2)} y={OY - 14} textAnchor="middle" fontSize={13} fill={OK} fontFamily={SERIF} fontWeight={700}>
           {fmtNum(r2)}
         </text>
       </g>
       <text
         x={215}
-        y={48}
+        y={26}
         textAnchor="middle"
-        fontSize={17}
+        fontSize={16}
         fill={GOLD}
         fontFamily={SERIF}
         fontWeight={700}
@@ -675,10 +674,10 @@ function BuildScene({ u, r1, r2, sum, prod, played, onPlay }) {
       >
         {`x² − (${fmtNum(sum)})x + (${fmtNum(prod)}) = 0`}
       </text>
-      <text x={215} y={72} textAnchor="middle" fontSize={13} fill={MUTED} fontFamily={SERIF} opacity={clamp01((u - 0.3) / 0.3)}>
+      <text x={215} y={48} textAnchor="middle" fontSize={12} fill={MUTED} fontFamily={SERIF} opacity={clamp01((u - 0.3) / 0.3)}>
         和 {fmtNum(sum)} · 積 {fmtNum(prod)}
       </text>
-      <Cta x={120} y={230} w={190} h={40} label="示範建方程" onClick={onPlay} done={played} />
+      <Cta x={120} y={CTA_Y} w={190} h={38} label="示範建方程" onClick={onPlay} done={played} />
     </g>
   )
 }
@@ -686,25 +685,25 @@ function BuildScene({ u, r1, r2, sum, prod, played, onPlay }) {
 function CoefScene({ u, r1, r2 }) {
   const sum = r1 + r2
   const prod = r1 * r2
-  const path = parabolaPath(0.45, -0.45 * sum, 0.45 * prod)
+  const path = parabolaPath(0.35, -0.35 * sum, 0.35 * prod)
   return (
     <g>
       <Axes />
       <path d={path} fill="none" stroke={BLUE} strokeWidth={2.4} opacity={clamp01(u / 0.35)} />
       <circle cx={toX(r1)} cy={OY} r={7} fill={GOLD} fillOpacity={0.35} stroke={GOLD} strokeWidth={2} opacity={clamp01(u / 0.3)} />
       <circle cx={toX(r2)} cy={OY} r={7} fill={OK} fillOpacity={0.35} stroke={OK} strokeWidth={2} opacity={clamp01(u / 0.3)} />
-      <Chip x={40} y={48} w={160} h={52} f={GOLD} label={`α+β = ${sum}`} sub="= −b/a" />
+      <Chip x={40} y={198} w={160} h={36} f={GOLD} label={`α+β = ${sum}`} sub="= −b/a" />
       <Chip
         x={230}
-        y={48}
+        y={198}
         w={160}
-        h={52}
+        h={36}
         f={OK}
         label={`αβ = ${prod}`}
         sub="= c/a"
         op={clamp01((u - 0.25) / 0.4)}
       />
-      <text x={215} y={268} textAnchor="middle" fontSize={14} fill={MUTED} fontFamily={SERIF} opacity={clamp01((u - 0.45) / 0.35)}>
+      <text x={215} y={28} textAnchor="middle" fontSize={13} fill={MUTED} fontFamily={SERIF} opacity={clamp01((u - 0.45) / 0.35)}>
         例：x² − 5x + 6 → 和 5 · 積 6
       </text>
     </g>
@@ -718,22 +717,22 @@ function SquaresScene({ u }) {
   const showEq = clamp01((u - 0.6) / 0.35)
   return (
     <g>
-      <rect x={70} y={55} width={140} height={140} rx={4} fill={BLUE} fillOpacity={0.15} stroke={BLUE} strokeWidth={1.8} opacity={showMain} />
-      <text x={140} y={130} textAnchor="middle" fontSize={18} fill={BLUE} fontFamily={SERIF} fontWeight={700} opacity={showMain}>
+      <rect x={70} y={40} width={120} height={120} rx={4} fill={BLUE} fillOpacity={0.15} stroke={BLUE} strokeWidth={1.8} opacity={showMain} />
+      <text x={130} y={108} textAnchor="middle" fontSize={17} fill={BLUE} fontFamily={SERIF} fontWeight={700} opacity={showMain}>
         (α+β)²
       </text>
-      <rect x={230} y={70} width={70} height={50} rx={4} fill={RED} fillOpacity={0.2} stroke={RED} strokeWidth={1.6} opacity={showSub} />
-      <rect x={310} y={70} width={70} height={50} rx={4} fill={RED} fillOpacity={0.2} stroke={RED} strokeWidth={1.6} opacity={showSub} />
-      <text x={270} y={100} textAnchor="middle" fontSize={13} fill={RED} fontFamily={SERIF} fontWeight={700} opacity={showSub}>
+      <rect x={230} y={55} width={70} height={50} rx={4} fill={RED} fillOpacity={0.2} stroke={RED} strokeWidth={1.6} opacity={showSub} />
+      <rect x={310} y={55} width={70} height={50} rx={4} fill={RED} fillOpacity={0.2} stroke={RED} strokeWidth={1.6} opacity={showSub} />
+      <text x={265} y={85} textAnchor="middle" fontSize={13} fill={RED} fontFamily={SERIF} fontWeight={700} opacity={showSub}>
         αβ
       </text>
-      <text x={345} y={100} textAnchor="middle" fontSize={13} fill={RED} fontFamily={SERIF} fontWeight={700} opacity={showSub}>
+      <text x={345} y={85} textAnchor="middle" fontSize={13} fill={RED} fontFamily={SERIF} fontWeight={700} opacity={showSub}>
         αβ
       </text>
-      <text x={215} y={230} textAnchor="middle" fontSize={18} fill={GOLD} fontFamily={SERIF} fontWeight={700} opacity={showEq}>
+      <text x={215} y={195} textAnchor="middle" fontSize={17} fill={GOLD} fontFamily={SERIF} fontWeight={700} opacity={showEq}>
         α²+β² = (α+β)² − 2αβ
       </text>
-      <text x={215} y={260} textAnchor="middle" fontSize={15} fill={OK} fontFamily={SERIF} fontWeight={700} opacity={showEq}>
+      <text x={215} y={220} textAnchor="middle" fontSize={14} fill={OK} fontFamily={SERIF} fontWeight={700} opacity={showEq}>
         例：25 − 12 = 13
       </text>
     </g>
@@ -746,62 +745,62 @@ function ComplexScene({ u, iPow, onSpin }) {
   const ang = angles[iPow] || 0
   const rad = ((ang - 90) * Math.PI) / 180
   const cx = 215
-  const cy = 145
-  const R = 70
+  const cy = 125
+  const R = 62
   const px = cx + R * Math.cos(rad)
   const py = cy + R * Math.sin(rad)
   return (
     <g>
       <circle cx={cx} cy={cy} r={R} fill="none" stroke={LINE} strokeWidth={1.4} opacity={clamp01(u / 0.3)} />
       <line x1={cx - R - 20} y1={cy} x2={cx + R + 20} y2={cy} stroke={LINE} strokeWidth={1.2} />
-      <line x1={cx} y1={cy - R - 20} x2={cx} y2={cy + R + 20} stroke={LINE} strokeWidth={1.2} />
-      <text x={cx + R + 28} y={cy + 4} fontSize={12} fill={MUTED} fontFamily={SERIF}>
+      <line x1={cx} y1={cy - R - 16} x2={cx} y2={cy + R + 16} stroke={LINE} strokeWidth={1.2} />
+      <text x={cx + R + 24} y={cy + 4} fontSize={12} fill={MUTED} fontFamily={SERIF}>
         Re
       </text>
-      <text x={cx + 6} y={cy - R - 24} fontSize={12} fill={MUTED} fontFamily={SERIF}>
+      <text x={cx + 6} y={cy - R - 20} fontSize={12} fill={MUTED} fontFamily={SERIF}>
         Im
       </text>
       <circle cx={px} cy={py} r={8} fill={GOLD} fillOpacity={0.4} stroke={GOLD} strokeWidth={2} opacity={clamp01(u / 0.3)} />
       <text x={px} y={py - 14} textAnchor="middle" fontSize={15} fill={GOLD} fontFamily={SERIF} fontWeight={700}>
         {labels[iPow]}
       </text>
-      <text x={215} y={48} textAnchor="middle" fontSize={16} fill={INK} fontFamily={SERIF} fontWeight={700} opacity={clamp01(u / 0.3)}>
+      <text x={215} y={28} textAnchor="middle" fontSize={15} fill={INK} fontFamily={SERIF} fontWeight={700} opacity={clamp01(u / 0.3)}>
         乘 i → 逆時針轉 90°
       </text>
-      <Cta x={140} y={240} w={150} h={40} label={iPow >= 4 ? '轉晒一圈' : '再乘 i'} onClick={onSpin} done={iPow >= 4} />
+      <Cta x={140} y={CTA_Y} w={150} h={38} label={iPow >= 4 ? '轉晒一圈' : '再乘 i'} onClick={onSpin} done={iPow >= 4} />
     </g>
   )
 }
 
 function ComplexBuildScene({ u, shown, onShow }) {
   const cx = 215
-  const cy = 140
+  const cy = 125
   return (
     <g>
       <line x1={60} y1={cy} x2={370} y2={cy} stroke={LINE} strokeWidth={1.2} opacity={clamp01(u / 0.3)} />
-      <line x1={cx} y1={50} x2={cx} y2={230} stroke={LINE} strokeWidth={1.2} opacity={clamp01(u / 0.3)} />
-      <circle cx={cx + 40} cy={cy - 55} r={8} fill={GOLD} fillOpacity={0.4} stroke={GOLD} strokeWidth={2} opacity={clamp01(u / 0.3)} />
-      <text x={cx + 40} y={cy - 70} textAnchor="middle" fontSize={13} fill={GOLD} fontFamily={SERIF} fontWeight={700}>
+      <line x1={cx} y1={48} x2={cx} y2={210} stroke={LINE} strokeWidth={1.2} opacity={clamp01(u / 0.3)} />
+      <circle cx={cx + 40} cy={cy - 48} r={8} fill={GOLD} fillOpacity={0.4} stroke={GOLD} strokeWidth={2} opacity={clamp01(u / 0.3)} />
+      <text x={cx + 40} y={cy - 62} textAnchor="middle" fontSize={13} fill={GOLD} fontFamily={SERIF} fontWeight={700}>
         2+3i
       </text>
       {shown && (
         <g className="fx-pop">
-          <circle cx={cx + 40} cy={cy + 55} r={8} fill={OK} fillOpacity={0.4} stroke={OK} strokeWidth={2} />
-          <text x={cx + 40} y={cy + 78} textAnchor="middle" fontSize={13} fill={OK} fontFamily={SERIF} fontWeight={700}>
+          <circle cx={cx + 40} cy={cy + 48} r={8} fill={OK} fillOpacity={0.4} stroke={OK} strokeWidth={2} />
+          <text x={cx + 40} y={cy + 70} textAnchor="middle" fontSize={13} fill={OK} fontFamily={SERIF} fontWeight={700}>
             2−3i
           </text>
-          <line x1={cx + 40} y1={cy - 55} x2={cx + 40} y2={cy + 55} stroke={MUTED} strokeWidth={1.2} strokeDasharray="4 3" />
-          <text x={215} y={48} textAnchor="middle" fontSize={16} fill={GOLD} fontFamily={SERIF} fontWeight={700}>
+          <line x1={cx + 40} y1={cy - 48} x2={cx + 40} y2={cy + 48} stroke={MUTED} strokeWidth={1.2} strokeDasharray="4 3" />
+          <text x={215} y={28} textAnchor="middle" fontSize={15} fill={GOLD} fontFamily={SERIF} fontWeight={700}>
             x² − 4x + 13 = 0
           </text>
         </g>
       )}
       {!shown && (
-        <text x={215} y={48} textAnchor="middle" fontSize={16} fill={INK} fontFamily={SERIF} fontWeight={700} opacity={clamp01(u / 0.3)}>
+        <text x={215} y={28} textAnchor="middle" fontSize={15} fill={INK} fontFamily={SERIF} fontWeight={700} opacity={clamp01(u / 0.3)}>
           一根：2 + 3i
         </text>
       )}
-      <Cta x={130} y={240} w={170} h={40} label="顯示共軛根" onClick={onShow} done={shown} />
+      <Cta x={130} y={CTA_Y} w={170} h={38} label="顯示共軛根" onClick={onShow} done={shown} />
     </g>
   )
 }
@@ -878,14 +877,15 @@ function SummaryScene({ u }) {
 }
 
 function Chip({ x, y, w, h, f, label, sub, op = 1 }) {
+  const compact = h < 44
   return (
     <g opacity={op} className={op > 0.2 ? 'fx-rise' : undefined}>
-      <rect x={x} y={y} width={w} height={h} rx={12} fill={f} fillOpacity={0.12} stroke={f} strokeWidth={1.8} />
+      <rect x={x} y={y} width={w} height={h} rx={compact ? 10 : 12} fill={f} fillOpacity={0.12} stroke={f} strokeWidth={1.8} />
       <text
         x={x + w / 2}
-        y={y + h / 2 + (sub ? -4 : 5)}
+        y={y + h / 2 + (sub ? (compact ? -5 : -4) : 5)}
         textAnchor="middle"
-        fontSize={18}
+        fontSize={compact ? 14 : 18}
         fill={f}
         fontWeight={700}
         fontFamily={SERIF}
@@ -893,7 +893,14 @@ function Chip({ x, y, w, h, f, label, sub, op = 1 }) {
         {label}
       </text>
       {sub && (
-        <text x={x + w / 2} y={y + h / 2 + 18} textAnchor="middle" fontSize={12} fill={MUTED} fontFamily={SERIF}>
+        <text
+          x={x + w / 2}
+          y={y + h / 2 + (compact ? 12 : 18)}
+          textAnchor="middle"
+          fontSize={compact ? 10 : 12}
+          fill={MUTED}
+          fontFamily={SERIF}
+        >
           {sub}
         </text>
       )}

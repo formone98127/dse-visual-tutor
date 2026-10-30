@@ -6,13 +6,13 @@ const FADE = { transition: 'opacity 0.4s ease' }
 
 /** 固定分區——唔好跟住行數變高度，否則每頁圖都會跳、顯得錯位 */
 const STAGE_W = 430
-const STAGE_H = 382
-const TITLE_Y = 21
-/** 圖形框高度 = 場景座標系高度（290），縮放才會係 1:1，唔會縮細留白 */
-const DIAG_Y = 30
+const STAGE_H = 396
+const TITLE_Y = 20
+/** 圖形框：略下移，唔同金色標題撞位（否則 titleHit 面積好大，睇落嚴重錯位） */
+const DIAG_Y = 40
 const DIAG_H = 290
-/** 圖框底 = 320；中文行高 ~16，baseline 要留夠空位，唔好伸入圖區 */
-const LINE_Y0 = 334
+/** 圖框底 = 330；中文行高 ~16，baseline 要留夠空位，唔好伸入圖區 */
+const LINE_Y0 = 344
 const LINE_GAP = 22
 const LINE_SIZE = 13.5
 
