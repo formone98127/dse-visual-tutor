@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { SYLLABUS } from '../data/syllabus.js'
+import { countReady } from '../lib/syllabusUtils.js'
 
 const MODE_OPTIONS = [
   { key: 'PRE_DSE', label: 'PRE-DSE', suffix: '初中' },
@@ -43,6 +44,7 @@ function ModeToggle({ mode, onChange }) {
 }
 
 function UnitRow({ unit, active, onSelect }) {
+  const ready = Boolean(unit.lessonId)
   return (
     <li>
       <button
@@ -50,19 +52,25 @@ function UnitRow({ unit, active, onSelect }) {
         className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition-all duration-200 ${
           active
             ? 'bg-amber-500/[0.12] text-amber-300'
-            : 'text-zinc-400 hover:translate-x-1 hover:bg-white/[0.06] hover:text-white'
+            : ready
+              ? 'text-zinc-300 hover:translate-x-1 hover:bg-white/[0.06] hover:text-white'
+              : 'text-zinc-500 hover:bg-white/[0.04]'
         }`}
       >
         <span
           className={`h-1.5 w-1.5 shrink-0 rounded-full transition-colors duration-200 ${
-            active ? 'bg-amber-400' : 'bg-zinc-600 group-hover:bg-zinc-400'
+            active ? 'bg-amber-400' : ready ? 'bg-emerald-400/80' : 'bg-zinc-700'
           }`}
         />
-        <span className="flex-1 truncate text-[13px] font-medium">{unit.title}</span>
-        {unit.lessonId ? (
-          active && (
+        <span className="min-w-0 flex-1 text-[13px] font-medium leading-snug">{unit.title}</span>
+        {ready ? (
+          active ? (
             <span className="rounded-full bg-amber-400/15 px-2 py-0.5 text-[10px] font-bold tracking-wider text-amber-400">
               上緊
+            </span>
+          ) : (
+            <span className="rounded-full bg-emerald-400/10 px-2 py-0.5 text-[10px] font-bold tracking-wider text-emerald-400/90">
+              可上課
             </span>
           )
         ) : (
@@ -73,7 +81,11 @@ function UnitRow({ unit, active, onSelect }) {
   )
 }
 
-function TopicAccordion({ topic, open, onToggle, activeUnitId, onSelectUnit }) {
+function TopicAccordion({ topic, open, onToggle, activeUnitId, onSelectUnit, readyOnly }) {
+  const units = readyOnly ? topic.units.filter((u) => u.lessonId) : topic.units
+  if (readyOnly && units.length === 0) return null
+  const readyCount = topic.units.filter((u) => u.lessonId).length
+
   return (
     <div
       className={`rounded-2xl border transition-colors duration-300 ${
@@ -103,7 +115,10 @@ function TopicAccordion({ topic, open, onToggle, activeUnitId, onSelectUnit }) {
             {topic.title}
           </span>
           <span className="mt-0.5 block text-[11px] text-zinc-500">
-            {[topic.strand, topic.hours ? `${topic.hours} 小時` : null, `${topic.units.length} 個單元`]
+            {[
+              topic.strand,
+              readyCount > 0 ? `${readyCount}/${topic.units.length} 可上課` : `${topic.units.length} 個單元 · 即將推出`,
+            ]
               .filter(Boolean)
               .join(' · ')}
           </span>
@@ -124,7 +139,7 @@ function TopicAccordion({ topic, open, onToggle, activeUnitId, onSelectUnit }) {
       <div className={`acc-body ${open ? 'open' : ''}`}>
         <div>
           <ul className="space-y-1 px-3 pb-3">
-            {topic.units.map((unit) => (
+            {units.map((unit) => (
               <UnitRow
                 key={unit.id}
                 unit={unit}
@@ -139,23 +154,60 @@ function TopicAccordion({ topic, open, onToggle, activeUnitId, onSelectUnit }) {
   )
 }
 
-export default function Sidebar({ mode, onChangeMode, activeUnitId, onSelectUnit, open }) {
+export default function Sidebar({
+  mode,
+  onChangeMode,
+  activeUnitId,
+  onSelectUnit,
+  open,
+  home = false,
+  continueTarget = null,
+  onContinue = null,
+  onCloseMenu = null,
+}) {
   const syllabus = SYLLABUS[mode]
+  const stats = useMemo(() => countReady(mode), [mode])
+  const [readyOnly, setReadyOnly] = useState(true)
   const [openTopic, setOpenTopic] = useState(syllabus[0]?.id ?? null)
+  const swipeStart = useRef(null)
 
-  // 轉 mode / 揀單元時，自動攤開「上緊課」所在嘅主題
+  // 轉 mode / 揀單元時，自動攤開「上緊課」所在嘅主題；篩選可上課時攤開第一個有課嘅
   useEffect(() => {
     const cur = SYLLABUS[mode].find((t) => t.units.some((u) => u.id === activeUnitId))
-    setOpenTopic(cur?.id ?? SYLLABUS[mode][0]?.id ?? null)
+    if (cur) {
+      setOpenTopic(cur.id)
+      return
+    }
+    const firstReady = SYLLABUS[mode].find((t) => t.units.some((u) => u.lessonId))
+    setOpenTopic(firstReady?.id ?? SYLLABUS[mode][0]?.id ?? null)
   }, [mode, activeUnitId])
+
+  // 手機：向左滑收起側欄，返去 Theater（首頁未揀課唔收）
+  const onTouchStart = (e) => {
+    const t = e.touches[0]
+    swipeStart.current = { x: t.clientX, y: t.clientY }
+  }
+  const onTouchEnd = (e) => {
+    if (!swipeStart.current || home || !onCloseMenu) {
+      swipeStart.current = null
+      return
+    }
+    const t = e.changedTouches[0]
+    const dx = t.clientX - swipeStart.current.x
+    const dy = t.clientY - swipeStart.current.y
+    swipeStart.current = null
+    // 明顯向左、而且橫多過直 → 收起側欄
+    if (dx < -60 && Math.abs(dx) > Math.abs(dy) * 1.2) onCloseMenu()
+  }
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-40 flex h-full w-72 flex-col border-r border-white/[0.08] bg-[#0e0e12] shadow-2xl transition-transform duration-300 md:static md:w-1/4 md:translate-x-0 md:shadow-none ${
-        open ? 'translate-x-0' : '-translate-x-full'
-      }`}
+      className={`fixed inset-y-0 left-0 z-40 flex h-full flex-col border-r border-white/[0.08] bg-[#0e0e12] shadow-2xl transition-transform duration-300 md:static md:w-1/4 md:translate-x-0 md:shadow-none ${
+        home ? 'w-full max-md:border-r-0' : 'w-72'
+      } ${open ? 'translate-x-0' : '-translate-x-full'}`}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
     >
-      {/* 標題區 */}
       <header className="px-7 pb-2 pt-9">
         <p className="text-[11px] font-medium uppercase tracking-[0.35em] text-amber-500/80">
           DSE Visual Tutor
@@ -163,14 +215,61 @@ export default function Sidebar({ mode, onChangeMode, activeUnitId, onSelectUnit
         <h1 className="mt-2.5 font-serif text-3xl font-black leading-tight text-white">
           DSE 數學神技
         </h1>
+        {home && (
+          <p className="mt-3 text-sm leading-relaxed text-zinc-400">
+            請先揀一個單元開始上課
+          </p>
+        )}
         <ModeToggle mode={mode} onChange={onChangeMode} />
+
+        {continueTarget && onContinue && (
+          <button
+            type="button"
+            onClick={onContinue}
+            className="mt-4 w-full rounded-2xl border border-amber-400/30 bg-gradient-to-r from-amber-400/20 to-amber-500/10 px-4 py-3 text-left transition-colors hover:border-amber-400/50 hover:from-amber-400/30"
+          >
+            <span className="block text-[11px] font-bold uppercase tracking-[0.2em] text-amber-400/90">
+              繼續上課
+            </span>
+            <span className="mt-1 block truncate text-sm font-semibold text-white">
+              {continueTarget.label}
+            </span>
+          </button>
+        )}
       </header>
 
-      {/* 課程列表區：EDB 課程大綱手風琴 */}
       <section className="flex-1 overflow-y-auto px-7 py-6">
-        <p className="mb-4 text-xs uppercase tracking-[0.3em] text-zinc-600">課程列表區</p>
-        {/* key={mode} 令切換時成組選單淡入，平滑過場 */}
-        <div key={mode} className="syllabus-in flex flex-col gap-3">
+        <div className="mb-4 flex items-center justify-between gap-2">
+          <p className="text-xs uppercase tracking-[0.3em] text-zinc-600">
+            {home ? '選擇單元' : '課程列表區'}
+          </p>
+          <span className="font-mono text-[10px] text-zinc-500">
+            {stats.ready}/{stats.total} · {stats.pct}%
+          </span>
+        </div>
+
+        <div className="mb-4 flex rounded-full border border-white/10 bg-white/[0.03] p-1">
+          <button
+            type="button"
+            onClick={() => setReadyOnly(true)}
+            className={`flex-1 rounded-full px-2 py-1.5 text-[11px] font-bold transition-colors ${
+              readyOnly ? 'bg-emerald-400/20 text-emerald-300' : 'text-zinc-500 hover:text-zinc-300'
+            }`}
+          >
+            可上課
+          </button>
+          <button
+            type="button"
+            onClick={() => setReadyOnly(false)}
+            className={`flex-1 rounded-full px-2 py-1.5 text-[11px] font-bold transition-colors ${
+              !readyOnly ? 'bg-white/10 text-white' : 'text-zinc-500 hover:text-zinc-300'
+            }`}
+          >
+            全部大綱
+          </button>
+        </div>
+
+        <div key={`${mode}-${readyOnly}`} className="syllabus-in flex flex-col gap-3">
           {syllabus.map((topic) => (
             <TopicAccordion
               key={topic.id}
@@ -179,6 +278,7 @@ export default function Sidebar({ mode, onChangeMode, activeUnitId, onSelectUnit
               onToggle={() => setOpenTopic((cur) => (cur === topic.id ? null : topic.id))}
               activeUnitId={activeUnitId}
               onSelectUnit={onSelectUnit}
+              readyOnly={readyOnly}
             />
           ))}
         </div>

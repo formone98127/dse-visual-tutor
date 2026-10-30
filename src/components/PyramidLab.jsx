@@ -374,7 +374,7 @@ export default function PyramidLab({ mode, onInteractComplete }) {
 
   return (
     <div className={`idx-lab ${solved ? 'is-solved' : ''}`}>
-      <svg className="vm-svg" viewBox="0 0 430 330" role="img" aria-label="直立角錐 VABCD 切模型：正弦定律搵 AP，兩條垂直線起 α，BH > HH′ 所以 α 大過 β">
+      <svg className="vm-svg" viewBox="0 0 430 382" overflow="hidden" role="img" aria-label="直立角錐 VABCD 切模型：正弦定律搵 AP，兩條垂直線起 α，BH > HH′ 所以 α 大過 β">
         {/* ─── p0 · 先睇圖 ─── */}
         {flags.figure && <PyramidFig u={clamp01(u / 0.9)} />}
 

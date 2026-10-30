@@ -1,4 +1,5 @@
 import { GOLD, BLUE, OK, RED, INK, MUTED, LINE, SERIF } from '../lib/palette.js'
+import LabStage, { on, FADE } from './LabStage.jsx'
 
 /**
  * K3 近似值與數值估計 lab — 逐步推演（stage 驅動，8 場景）：
@@ -21,31 +22,6 @@ function Text({ x, y, size = 22, fill = INK, w = 600, children, anchor = 'middle
   )
 }
 
-const on = (k, stage) => (stage >= k ? 1 : 0)
-const FADE = { transition: 'opacity 0.4s ease' }
-
-function Stage({ title, stage, children, lines = [], ds = 0 }) {
-  return (
-    <div className="idx-lab">
-      <svg className="vm-svg" viewBox="0 0 430 330" role="img">
-        <text x={215} y={26} textAnchor="middle" fontSize={25} fill={GOLD} fontWeight={700}
-          fontFamily={SERIF} letterSpacing={2}>
-          {title}
-        </text>
-        <g transform="translate(60.2 18.2) scale(0.72)">{children}</g>
-        {lines.map((parts, i) => (
-          <text key={i} x={50} y={266 + i * 27} opacity={on(ds + 1 + i, stage)}
-            style={FADE} fontFamily={SERIF} fontSize={17.5} fontWeight={600}>
-            {parts.map((p, j) => (
-              <tspan key={j} fill={p.fill || INK} fontWeight={p.b ? 700 : 600}>{p.t}</tspan>
-            ))}
-          </text>
-        ))}
-      </svg>
-    </div>
-  )
-}
-
 export default function ApproxLab({ mode, stage = 99 }) {
 
   /* ---- 1 · 近似值概念：171.3 cm ---- */
@@ -53,7 +29,7 @@ export default function ApproxLab({ mode, stage = 99 }) {
     // 數線 170 → 172（x 60-370）
     const vx = (v) => 60 + ((v - 170) / 2) * 310
     return (
-      <Stage title="近似值 · 真值 vs 近似值" stage={stage} ds={3}
+      <LabStage title="近似值 · 真值 vs 近似值" stage={stage} ds={3}
         lines={[
           [{ t: '真值 171.3 cm 通常唔會話人知咁精確' }],
           [{ t: '近似到個位（cm）：171.3 → ' }, { t: '171 cm', fill: GOLD, b: true }],
@@ -80,7 +56,7 @@ export default function ApproxLab({ mode, stage = 99 }) {
           <path d={`M ${vx(171.3)} 165 C ${vx(171.3)} 200, ${vx(171)} 190, ${vx(171)} 168`} fill="none" stroke={BLUE} strokeWidth={2} strokeDasharray="5 4" />
           <Text x={vx(171) - 8} y={218} size={16} fill={BLUE} w={700}>近似到 cm → 171</Text>
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
@@ -89,7 +65,7 @@ export default function ApproxLab({ mode, stage = 99 }) {
     // 數字位:3 . 1 4 | 1 5 9 — x 由 118 起,每 42px
     const dx = [118, 160, 202, 244, 286, 328, 370]
     return (
-      <Stage title="四捨五入 · 3.14159（2 位小數）" stage={stage} ds={3}
+      <LabStage title="四捨五入 · 3.14159（2 位小數）" stage={stage} ds={3}
         lines={[
           [{ t: '第 1 步　保留 2 位小數：3.14　睇後一個位：' }, { t: '1', fill: RED, b: true }],
           [{ t: '第 2 步　1 < 5 → 捨去（唔進位）' }],
@@ -116,14 +92,14 @@ export default function ApproxLab({ mode, stage = 99 }) {
           <Text x={dx[4]} y={162} size={14} fill={RED} w={700}>睇呢個位</Text>
         </g>
         <Text x={215} y={228} size={26} fill={GOLD} w={700} opacity={on(3, stage)}>3.14159 ≈ 3.14</Text>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 3 · 有效數字 ---- */
   if (mode === 'sig_fig') {
     return (
-      <Stage title="有效數字 · 由第一個非零開始數" stage={stage} ds={3}
+      <LabStage title="有效數字 · 由第一個非零開始數" stage={stage} ds={3}
         lines={[
           [{ t: '3.14159 → 3 位有效：3、1、4 → ' }, { t: '3.14', fill: GOLD, b: true }],
           [{ t: '0.02046：前面兩個 0 唔算，由 2 開始數' }],
@@ -152,14 +128,14 @@ export default function ApproxLab({ mode, stage = 99 }) {
         <g opacity={on(2, stage)}>
           <Text x={215} y={210} size={19} fill={GOLD} w={700}>0.02046 ≈ 0.0205（3 s.f.）</Text>
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 4 · 整數位：2 748 → 十 / 百 / 千 ---- */
   if (mode === 'round_place') {
     return (
-      <Stage title="四捨五入 · 2 748 到十 / 百 / 千" stage={stage} ds={3}
+      <LabStage title="四捨五入 · 2 748 到十 / 百 / 千" stage={stage} ds={3}
         lines={[
           [{ t: '到十位　睇個位 8 ≥ 5 → 進 1 → ' }, { t: '2 750', fill: GOLD, b: true }],
           [{ t: '到百位　睇十位 4 < 5 → 捨　→ ' }, { t: '2 700', fill: GOLD, b: true }],
@@ -183,14 +159,14 @@ export default function ApproxLab({ mode, stage = 99 }) {
         <g opacity={on(2, stage)}>
           <Text x={215} y={232} size={19}>十位 4 細過 5 → 百位唔進：27 → 尾兩位變 00</Text>
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 5 · 估算策略：湊整 ---- */
   if (mode === 'estimate') {
     return (
-      <Stage title="估算 · 湊整速算" stage={stage} ds={3}
+      <LabStage title="估算 · 湊整速算" stage={stage} ds={3}
         lines={[
           [{ t: '原式　4.98 × 5.12　（條數好醜）' }],
           [{ t: '湊整　≈ 5 × 5 = ' }, { t: '25', fill: GOLD, b: true }],
@@ -207,14 +183,14 @@ export default function ApproxLab({ mode, stage = 99 }) {
         <g opacity={on(2, stage)}>
           <Text x={215} y={236} size={38} fill={GOLD} w={700}>= 25</Text>
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 6 · 應用：購物 ---- */
   if (mode === 'real_life') {
     return (
-      <Stage title="應用 · 購物估計" stage={stage} ds={3}
+      <LabStage title="應用 · 購物估計" stage={stage} ds={3}
         lines={[
           [{ t: '每件 $49.9，買 3 件 —— 大約要帶幾多錢？' }],
           [{ t: '估計：$50 × 3 = ' }, { t: '$150', fill: GOLD, b: true }],
@@ -231,7 +207,7 @@ export default function ApproxLab({ mode, stage = 99 }) {
         <g opacity={on(2, stage)}>
           <Text x={215} y={236} size={36} fill={GOLD} w={700}>$50 × 3 = $150</Text>
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
@@ -247,7 +223,7 @@ export default function ApproxLab({ mode, stage = 99 }) {
       </g>
     )
     return (
-      <Stage title="常犯錯誤 · 兩大陷阱" stage={stage} ds={3}
+      <LabStage title="常犯錯誤 · 兩大陷阱" stage={stage} ds={3}
         lines={[
           [{ t: '陷阱 1：有效數字由「第一個非零」開始數，0 唔算' }],
           [{ t: '陷阱 2：剛好 5 都要進位（四捨「五」入，5 就係入）' }],
@@ -256,8 +232,8 @@ export default function ApproxLab({ mode, stage = 99 }) {
       >
         {card(25, '0.02046 → 204', '→ 0.0205', on(0, stage))}
         {card(230, '2.65 → 2.6', '→ 2.7', on(1, stage))}
-        <Text x={215} y={278} size={16} fill={GOLD} w={700} opacity={on(2, stage)}>前一個位先係「判官」，5 就進</Text>
-      </Stage>
+        <Text x={215} y={255} size={16} fill={GOLD} w={700} opacity={on(2, stage)}>前一個位先係「判官」，5 就進</Text>
+      </LabStage>
     )
   }
 
@@ -273,7 +249,7 @@ export default function ApproxLab({ mode, stage = 99 }) {
     const POS = [[16, 55], [152, 55], [288, 55], [84, 185], [220, 185]]
     return (
       <div className="idx-lab">
-        <svg className="vm-svg" viewBox="0 0 430 330" role="img" aria-label="第三章近似值總結">
+        <svg className="vm-svg" viewBox="0 0 430 382" role="img" aria-label="第三章近似值總結">
           {CARDS.map(([num, t, ex], i) => (
             <g key={num} opacity={on(i, stage)} style={FADE}>
               <rect x={POS[i][0]} y={POS[i][1]} width={126} height={112} rx={14} fill="rgba(255,255,255,0.05)" stroke="rgba(242,245,255,0.18)" strokeWidth={1.4} />

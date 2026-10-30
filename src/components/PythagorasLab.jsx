@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { clamp01, useFly } from '../lib/labMotion.js'
 
 /**
@@ -57,21 +58,26 @@ const C2 = [[200, 60], [320, 150], [230, 270], [110, 180]]
 const lerpPt = (p1, p2, t) => [p1[0] + (p2[0] - p1[0]) * t, p1[1] + (p2[1] - p1[1]) * t]
 const ptsStr = (pts) => pts.map((p) => p.join(',')).join(' ')
 
+/** 圖底說明帶——同邊長標註分區，避免撞字 */
+const CAPTION_Y = 348
+
 /** (a+b)² 大正方形 + 邊長 a、b 分割標註 */
-function BigSquare({ u }) {
+function BigSquare({ u, showEdgeLabels = true }) {
   return (
     <g opacity={clamp01(u / 0.35)}>
       <rect x={110} y={60} width={210} height={210} fill="rgba(255,255,255,0.03)" stroke={LINE} strokeWidth={1.8} rx={6} />
-      <g opacity={clamp01((u - 0.3) / 0.4)} fontFamily={SERIF} fontStyle="italic" fontWeight={600} fontSize={17}>
-        {/* 底邊：左段 b (120px)，右段 a (90px) */}
-        <line x1={230} y1={270} x2={230} y2={279} stroke={MUTED} strokeWidth={1.4} />
-        <text x={170} y={298} textAnchor="middle" fill={INK}>b</text>
-        <text x={275} y={298} textAnchor="middle" fill={INK}>a</text>
-        {/* 左邊：上段 b (120px)，下段 a (90px) */}
-        <line x1={101} y1={180} x2={110} y2={180} stroke={MUTED} strokeWidth={1.4} />
-        <text x={92} y={125} textAnchor="end" fill={INK}>b</text>
-        <text x={92} y={232} textAnchor="end" fill={INK}>a</text>
-      </g>
+      {showEdgeLabels ? (
+        <g opacity={clamp01((u - 0.3) / 0.4)} fontFamily={SERIF} fontStyle="italic" fontWeight={600} fontSize={17}>
+          {/* 底邊：左段 b (120px)，右段 a (90px)——貼近邊，留空俾 CAPTION_Y */}
+          <line x1={230} y1={270} x2={230} y2={278} stroke={MUTED} strokeWidth={1.4} />
+          <text x={170} y={288} textAnchor="middle" fill={INK}>b</text>
+          <text x={275} y={288} textAnchor="middle" fill={INK}>a</text>
+          {/* 左邊：上段 b (120px)，下段 a (90px) */}
+          <line x1={101} y1={180} x2={110} y2={180} stroke={MUTED} strokeWidth={1.4} />
+          <text x={92} y={125} textAnchor="end" fill={INK}>b</text>
+          <text x={92} y={232} textAnchor="end" fill={INK}>a</text>
+        </g>
+      ) : null}
     </g>
   )
 }
@@ -95,7 +101,7 @@ function Triangle({ u, opacity = 1 }) {
       <path d="M 150 188 L 162 188 L 162 200" fill="none" stroke={GOLD} strokeWidth={1.4} opacity={clamp01((u - 0.3) / 0.3)} />
       <g opacity={clamp01((u - 0.4) / 0.35)} fontFamily={SERIF} fontStyle="italic" fontWeight={600}>
         <text x={136} y={160} textAnchor="end" fontSize={19} fill={INK}>a</text>
-        <text x={210} y={288} textAnchor="middle" fontSize={19} fill={INK}>b</text>
+        <text x={210} y={218} textAnchor="middle" fontSize={19} fill={INK}>b</text>
         <text x={224} y={142} textAnchor="middle" fontSize={19} fill={GOLD}>c</text>
       </g>
     </g>
@@ -112,14 +118,60 @@ const DUR = {
 
 export default function PythagorasLab({ mode }) {
   const u = useFly(mode, DUR[mode] ?? 1400)
+  const svgRef = useRef(null)
+
+  // #region agent log
+  useEffect(() => {
+    const t = setTimeout(() => {
+      const svg = svgRef.current
+      if (!svg) return
+      const texts = [...svg.querySelectorAll('text')]
+        .filter((el) => +getComputedStyle(el).opacity > 0.05)
+        .map((el) => {
+          const b = el.getBBox()
+          return { text: (el.textContent || '').trim().slice(0, 40), x: +b.x.toFixed(1), y: +b.y.toFixed(1), w: +b.width.toFixed(1), h: +b.height.toFixed(1) }
+        })
+      const textText = []
+      for (let i = 0; i < texts.length; i++) {
+        for (let j = i + 1; j < texts.length; j++) {
+          const a = texts[i]
+          const b = texts[j]
+          const ox = Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x))
+          const oy = Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y))
+          if (ox * oy > 20) textText.push({ a: a.text, b: b.text, area: Math.round(ox * oy) })
+        }
+      }
+      const bottom = texts.filter((t) => t.y > 260).sort((a, b) => a.y - b.y)
+      const crowding = []
+      for (let i = 0; i < bottom.length - 1; i++) {
+        const gap = bottom[i + 1].y - (bottom[i].y + bottom[i].h)
+        if (gap < 8) crowding.push({ a: bottom[i].text, b: bottom[i + 1].text, gap: +gap.toFixed(1) })
+      }
+      fetch('http://127.0.0.1:7691/ingest/cc9e9dff-d30f-40e1-a86b-8f44c754203f', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': 'fb17f7' },
+        body: JSON.stringify({
+          sessionId: 'fb17f7',
+          runId: 'post-fix',
+          hypothesisId: 'A_E',
+          location: 'PythagorasLab.jsx:measure',
+          message: 'Pythagoras text overlap / bottom crowding',
+          data: { mode, u: +u.toFixed(2), textText, crowding, bottom, textCount: texts.length },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {})
+    }, 500)
+    return () => clearTimeout(t)
+  }, [mode, u])
+  // #endregion
 
   /* ---- 1 · 直角三角形 ---- */
   if (mode === 'show_triangle') {
     return (
       <div className="idx-lab">
-        <svg className="vm-svg" viewBox="0 0 430 330" role="img" aria-label="直角三角形，邊長 a、b、c">
+        <svg ref={svgRef} className="vm-svg" viewBox="0 0 430 382" overflow="hidden" role="img" aria-label="直角三角形，邊長 a、b、c">
           <Triangle u={u} />
-          <text x={215} y={318} textAnchor="middle" fontSize={14} fill={MUTED} fontFamily={SERIF} opacity={clamp01((u - 0.6) / 0.3)}>
+          <text x={215} y={CAPTION_Y} textAnchor="middle" fontSize={14} fill={MUTED} fontFamily={SERIF} opacity={clamp01((u - 0.6) / 0.3)}>
             直角三角形：a、b 係兩條直角邊，c 係斜邊
           </text>
         </svg>
@@ -134,7 +186,7 @@ export default function PythagorasLab({ mode }) {
     const cU = clamp01((u - 0.75) / 0.25)
     return (
       <div className="idx-lab">
-        <svg className="vm-svg" viewBox="0 0 430 330" role="img" aria-label="喺 a 邊畫藍色 a²，b 邊畫黃色 b²，斜邊 c² 虛線預告">
+        <svg ref={svgRef} className="vm-svg" viewBox="0 0 430 382" overflow="hidden" role="img" aria-label="喺 a 邊畫藍色 a²，b 邊畫黃色 b²，斜邊 c² 虛線預告">
           <g opacity={blueU}>
             <rect x={95} y={115} width={75} height={75} fill={BLUE} fillOpacity={0.3} stroke={BLUE} strokeWidth={2} rx={4} />
             <text x={132} y={152} textAnchor="middle" fontSize={20} fill={BLUE} fontFamily={SERIF} fontWeight={700} dominantBaseline="central">
@@ -172,9 +224,9 @@ export default function PythagorasLab({ mode }) {
   if (mode === 'build_square') {
     return (
       <div className="idx-lab">
-        <svg className="vm-svg" viewBox="0 0 430 330" role="img" aria-label="大正方形，邊長 = a + b">
+        <svg ref={svgRef} className="vm-svg" viewBox="0 0 430 382" overflow="hidden" role="img" aria-label="大正方形，邊長 = a + b">
           <BigSquare u={u} />
-          <text x={215} y={318} textAnchor="middle" fontSize={15} fill={GOLD} fontFamily={SERIF} fontWeight={600} opacity={clamp01((u - 0.6) / 0.3)}>
+          <text x={215} y={CAPTION_Y} textAnchor="middle" fontSize={15} fill={GOLD} fontFamily={SERIF} fontWeight={600} opacity={clamp01((u - 0.6) / 0.3)}>
             邊長 = a + b
           </text>
         </svg>
@@ -188,7 +240,7 @@ export default function PythagorasLab({ mode }) {
     const pulseU = clamp01((u - 0.82) / 0.18)
     return (
       <div className="idx-lab">
-        <svg className="vm-svg" viewBox="0 0 430 330" role="img" aria-label="藍 a²、黃 b² 同 4 塊三角形啱啱好填滿大正方形">
+        <svg ref={svgRef} className="vm-svg" viewBox="0 0 430 382" overflow="hidden" role="img" aria-label="藍 a²、黃 b² 同 4 塊三角形啱啱好填滿大正方形">
           <BigSquare u={clamp01(u / 0.15)} />
           <ZoneSquares op={clamp01((u - 0.15) / 0.3)} />
           {PIECES.map((p, i) => (
@@ -204,7 +256,7 @@ export default function PythagorasLab({ mode }) {
             />
           ))}
           <g className="idx-pulse" opacity={pulseU}>
-            <text x={215} y={318} textAnchor="middle" fontSize={15} fill={GOLD} fontFamily={SERIF} fontWeight={700}>
+            <text x={215} y={CAPTION_Y} textAnchor="middle" fontSize={15} fill={GOLD} fontFamily={SERIF} fontWeight={700}>
               啱啱好填滿，一忽忽都唔多唔少！
             </text>
           </g>
@@ -218,7 +270,7 @@ export default function PythagorasLab({ mode }) {
     const zoneOp = u < 0.7 ? 1 : 1 - ((u - 0.7) / 0.3) * 0.85
     return (
       <div className="idx-lab">
-        <svg className="vm-svg" viewBox="0 0 430 330" role="img" aria-label="4 塊三角形移去四隻角，藍黃讓出中間">
+        <svg ref={svgRef} className="vm-svg" viewBox="0 0 430 382" overflow="hidden" role="img" aria-label="4 塊三角形移去四隻角，藍黃讓出中間">
           <BigSquare u={clamp01(u / 0.15)} />
           <ZoneSquares op={zoneOp} />
           {PIECES.map((p, i) => (
@@ -246,7 +298,7 @@ export default function PythagorasLab({ mode }) {
     const txtU = clamp01((u - 0.75) / 0.25)
     return (
       <div className="idx-lab">
-        <svg className="vm-svg" viewBox="0 0 430 330" role="img" aria-label="中間剩低傾斜正方形，條邊係斜邊 c，面積 c²">
+        <svg ref={svgRef} className="vm-svg" viewBox="0 0 430 382" overflow="hidden" role="img" aria-label="中間剩低傾斜正方形，條邊係斜邊 c，面積 c²">
           <BigSquare u={clamp01(u / 0.15)} />
           {PIECES.map((p, i) => (
             <polygon
@@ -270,7 +322,7 @@ export default function PythagorasLab({ mode }) {
               c
             </text>
           </g>
-          <text x={215} y={318} textAnchor="middle" fontSize={15} fill={INK} fontFamily={SERIF} fontWeight={600} opacity={txtU}>
+          <text x={215} y={CAPTION_Y} textAnchor="middle" fontSize={15} fill={INK} fontFamily={SERIF} fontWeight={600} opacity={txtU}>
             剩低嘅面積 = 邊長 c 嘅正方形 = c²
           </text>
         </svg>
@@ -284,14 +336,14 @@ export default function PythagorasLab({ mode }) {
     const eqU = clamp01((u - 0.5) / 0.4)
     return (
       <div className="idx-lab">
-        <svg className="vm-svg" viewBox="0 0 430 330" role="img" aria-label="c² 藍黃漸變填滿，a² + b² = c²">
+        <svg ref={svgRef} className="vm-svg" viewBox="0 0 430 382" overflow="hidden" role="img" aria-label="c² 藍黃漸變填滿，a² + b² = c²">
           <defs>
             <linearGradient id="c2fill" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stopColor={BLUE} stopOpacity="0.55" />
               <stop offset="100%" stopColor={GOLD} stopOpacity="0.55" />
             </linearGradient>
           </defs>
-          <BigSquare u={clamp01(u / 0.15)} />
+          <BigSquare u={clamp01(u / 0.15)} showEdgeLabels={false} />
           {PIECES.map((p, i) => (
             <polygon
               key={i}
@@ -311,7 +363,7 @@ export default function PythagorasLab({ mode }) {
             </text>
           </g>
           <g className="idx-pulse" opacity={eqU}>
-            <text x={215} y={312} textAnchor="middle" fontSize={24} fill={GOLD} fontFamily={SERIF} fontWeight={700}>
+            <text x={215} y={CAPTION_Y} textAnchor="middle" fontSize={24} fill={GOLD} fontFamily={SERIF} fontWeight={700}>
               a² + b² = c²
             </text>
           </g>

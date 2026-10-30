@@ -1,4 +1,5 @@
 import { GOLD, BLUE, OK, RED, INK, MUTED, LINE, SERIF } from '../lib/palette.js'
+import LabStage, { on, FADE } from './LabStage.jsx'
 
 /**
  * K4 有理數與無理數 lab — 逐步推演（stage 驅動，10 場景）：
@@ -23,37 +24,12 @@ function Text({ x, y, size = 22, fill = INK, w = 600, children, anchor = 'middle
   )
 }
 
-const on = (k, stage) => (stage >= k ? 1 : 0)
-const FADE = { transition: 'opacity 0.4s ease' }
-
-function Stage({ title, stage, children, lines = [], ds = 0 }) {
-  return (
-    <div className="idx-lab">
-      <svg className="vm-svg" viewBox="0 0 430 330" role="img">
-        <text x={215} y={26} textAnchor="middle" fontSize={25} fill={GOLD} fontWeight={700}
-          fontFamily={SERIF} letterSpacing={2}>
-          {title}
-        </text>
-        <g transform="translate(60.2 18.2) scale(0.72)">{children}</g>
-        {lines.map((parts, i) => (
-          <text key={i} x={50} y={266 + i * 27} opacity={on(ds + i, stage)}
-            style={FADE} fontFamily={SERIF} fontSize={17.5} fontWeight={600}>
-            {parts.map((p, j) => (
-              <tspan key={j} fill={p.fill || INK} fontWeight={p.b ? 700 : 600}>{p.t}</tspan>
-            ))}
-          </text>
-        ))}
-      </svg>
-    </div>
-  )
-}
-
 export default function RationalLab({ mode, stage = 99 }) {
 
   /* ---- 1 · 根號與 n 次方根 ---- */
   if (mode === 'nth_root') {
     return (
-      <Stage title="根號 · √ 係咩意思" stage={stage} ds={4}
+      <LabStage title="根號 · √ 係咩意思" stage={stage} ds={4}
         lines={[
           [{ t: '√16 讀「16 嘅平方根」——邊個數自乘等於 16？' }],
           [{ t: '4 × 4 = 16　→　√16 = ', }, { t: '4', fill: GOLD, b: true }],
@@ -70,10 +46,7 @@ export default function RationalLab({ mode, stage = 99 }) {
         <g opacity={on(2, stage)}>
           <Text x={215} y={252} size={28} fill={OK} w={700}>4 × 4 = 16 ✓</Text>
         </g>
-        <g opacity={on(3, stage)} style={FADE}>
-          <Text x={215} y={300} size={22} fill={MUTED}>三次方根：∛27 = 3</Text>
-        </g>
-      </Stage>
+      </LabStage>
     )
   }
 
@@ -81,7 +54,7 @@ export default function RationalLab({ mode, stage = 99 }) {
   if (mode === 'irrational') {
     // 數線 0 → 2：x 60-370，√2 ≈ 1.414 → x = 60 + (1.414/2)*310 ≈ 279
     return (
-      <Stage title="√2 · 一個除唔盡嘅數" stage={stage} ds={4}
+      <LabStage title="√2 · 一個除唔盡嘅數" stage={stage} ds={4}
         lines={[
           [{ t: '√2 = 1.41421356...　小數位無限延續、永不循環' }],
           [{ t: '唔能夠寫成分數 p/q → 呢類數叫', }, { t: '無理數', fill: RED, b: true }],
@@ -108,14 +81,14 @@ export default function RationalLab({ mode, stage = 99 }) {
           <Text x={215} y={105} size={20} fill={GOLD} w={700}>1.4142135623...</Text>
           <Text x={215} y={132} size={15} fill={MUTED}>小數位無限 + 唔循環</Text>
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 3 · 有理數 ---- */
   if (mode === 'rational') {
     return (
-      <Stage title="有理數 · 寫得到 p/q 就係" stage={stage} ds={4}
+      <LabStage title="有理數 · 寫得到 p/q 就係" stage={stage} ds={4}
         lines={[
           [{ t: '有理數 = 可以寫成 p/q（分數）嘅數' }],
           [{ t: '整數 ✓　分數 ✓　有限小數 ✓　循環小數 ✓' }],
@@ -134,7 +107,7 @@ export default function RationalLab({ mode, stage = 99 }) {
             <Text x={210} y={64 + i * 56 + 22} size={17} fill={MUTED} anchor="start" vb>{note}</Text>
           </g>
         ))}
-      </Stage>
+      </LabStage>
     )
   }
 
@@ -151,7 +124,7 @@ export default function RationalLab({ mode, stage = 99 }) {
       ['√49', '有理', BLUE, '= 7'],
     ]
     return (
-      <Stage title="分類 · 有理定無理？" stage={stage} ds={4}
+      <LabStage title="分類 · 有理定無理？" stage={stage} ds={4}
         lines={[
           [{ t: '有理（藍）：√25 = 5 · 0.5 · −3 · 0.7 · √49 = 7' }],
           [{ t: '無理（紅）：√7 · π · √2 —— 開唔盡 / 除唔盡', fill: MUTED }],
@@ -170,14 +143,14 @@ export default function RationalLab({ mode, stage = 99 }) {
             </g>
           )
         })}
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 5 · 化簡根式 ---- */
   if (mode === 'simplify') {
     return (
-      <Stage title="化簡根式 · √8 = ?" stage={stage} ds={4}
+      <LabStage title="化簡根式 · √8 = ?" stage={stage} ds={4}
         lines={[
           [{ t: '搵最大完全平方因數：8 = 4 × 2' }],
           [{ t: '√8 = √4 × √2 = 2√2' }],
@@ -194,14 +167,14 @@ export default function RationalLab({ mode, stage = 99 }) {
         <g opacity={on(2, stage)}>
           <Text x={215} y={224} size={26} fill={GOLD} w={700}>= √4 × √2 = 2√2</Text>
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 6 · 同類根式相加 ---- */
   if (mode === 'surd_add') {
     return (
-      <Stage title="同類根式 · 加減要同根" stage={stage} ds={4}
+      <LabStage title="同類根式 · 加減要同根" stage={stage} ds={4}
         lines={[
           [{ t: '同類根式（√2 同 √2）先可以直接加：' }],
           [{ t: '3√2 + 5√2 = ' }, { t: '8√2', fill: GOLD, b: true }],
@@ -217,14 +190,14 @@ export default function RationalLab({ mode, stage = 99 }) {
         <g opacity={on(2, stage)}>
           <Text x={215} y={210} size={34} fill={GOLD} w={700}>= 8√2</Text>
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 7 · 根式相乘 ---- */
   if (mode === 'surd_mul') {
     return (
-      <Stage title="根式相乘 · √a × √b = √ab" stage={stage} ds={4}
+      <LabStage title="根式相乘 · √a × √b = √ab" stage={stage} ds={4}
         lines={[
           [{ t: '法則：√a × √b = √(ab)' }],
           [{ t: '例 1　√2 × √3 = √6' }],
@@ -243,14 +216,14 @@ export default function RationalLab({ mode, stage = 99 }) {
         <g opacity={on(3, stage)} style={FADE}>
           <Text x={215} y={262} size={30} fill={GOLD} w={700}>= 4</Text>
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 8 · 應用：正方形邊長 ---- */
   if (mode === 'real_life') {
     return (
-      <Stage title="應用 · 面積 2 m² 嘅正方形" stage={stage} ds={4}
+      <LabStage title="應用 · 面積 2 m² 嘅正方形" stage={stage} ds={4}
         lines={[
           [{ t: '正方形面積 = 邊長² → 邊長 = √面積' }],
           [{ t: '邊長 = √2 m ≈ ' }, { t: '1.41 m', fill: GOLD, b: true }, { t: '（無理數都係實長度！）' }],
@@ -268,10 +241,7 @@ export default function RationalLab({ mode, stage = 99 }) {
         <g opacity={on(2, stage)}>
           <Text x={215} y={258} size={22} fill={GOLD} w={700}>√2 ≈ 1.41</Text>
         </g>
-        <g opacity={on(3, stage)} style={FADE}>
-          <Text x={215} y={296} size={16} fill={MUTED}>驗算：1.41 × 1.41 ≈ 2 ✓</Text>
-        </g>
-      </Stage>
+      </LabStage>
     )
   }
 
@@ -287,7 +257,7 @@ export default function RationalLab({ mode, stage = 99 }) {
       </g>
     )
     return (
-      <Stage title="常犯錯誤 · 根式兩大陷阱" stage={stage} ds={3}
+      <LabStage title="常犯錯誤 · 根式兩大陷阱" stage={stage} ds={3}
         lines={[
           [{ t: '陷阱 1：√a + √b 唔等於 √(a+b)——加減唔可以入根號' }],
           [{ t: '陷阱 2：√ 嘅答案係正嗰個（√9 = 3，唔係 ±3）', fill: MUTED }],
@@ -295,8 +265,8 @@ export default function RationalLab({ mode, stage = 99 }) {
       >
         {card(25, '√2 + √3 = √5', '√2 + √3 留返咁寫', on(0, stage))}
         {card(230, '√9 + √16 = √25', '3 + 4 = 7 ≠ 5', on(1, stage))}
-        <Text x={215} y={278} size={17} fill={GOLD} w={700} opacity={on(2, stage)}>乘除先入得根號，加減唔入！</Text>
-      </Stage>
+        <Text x={215} y={255} size={17} fill={GOLD} w={700} opacity={on(2, stage)}>乘除先入得根號，加減唔入！</Text>
+      </LabStage>
     )
   }
 
@@ -312,7 +282,7 @@ export default function RationalLab({ mode, stage = 99 }) {
     const POS = [[16, 55], [152, 55], [288, 55], [84, 185], [220, 185]]
     return (
       <div className="idx-lab">
-        <svg className="vm-svg" viewBox="0 0 430 330" role="img" aria-label="第四章有理數與無理數總結">
+        <svg className="vm-svg" viewBox="0 0 430 382" role="img" aria-label="第四章有理數與無理數總結">
           {CARDS.map(([num, t, ex], i) => (
             <g key={num} opacity={on(i, stage)} style={FADE}>
               <rect x={POS[i][0]} y={POS[i][1]} width={126} height={112} rx={14} fill="rgba(255,255,255,0.05)" stroke="rgba(242,245,255,0.18)" strokeWidth={1.4} />

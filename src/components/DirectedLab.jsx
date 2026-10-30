@@ -1,4 +1,5 @@
 import { GOLD, BLUE, OK, RED, INK, MUTED, LINE, SERIF } from '../lib/palette.js'
+import LabStage, { on, FADE } from './LabStage.jsx'
 
 /**
  * K2 有向數 lab — 逐步推演（stage 驅動，11 場景）：
@@ -21,31 +22,6 @@ function Text({ x, y, size = 22, fill = INK, w = 600, children, anchor = 'middle
       fontFamily={SERIF} opacity={opacity} dominantBaseline={vb ? 'central' : undefined}>
       {children}
     </text>
-  )
-}
-
-const on = (k, stage) => (stage >= k ? 1 : 0)
-const FADE = { transition: 'opacity 0.4s ease' }
-
-function Stage({ title, stage, children, lines = [], ds = 0 }) {
-  return (
-    <div className="idx-lab">
-      <svg className="vm-svg" viewBox="0 0 430 330" role="img">
-        <text x={215} y={26} textAnchor="middle" fontSize={25} fill={GOLD} fontWeight={700}
-          fontFamily={SERIF} letterSpacing={2}>
-          {title}
-        </text>
-        <g transform="translate(60.2 18.2) scale(0.72)">{children}</g>
-        {lines.map((parts, i) => (
-          <text key={i} x={50} y={266 + i * 27} opacity={on(ds + 1 + i, stage)}
-            style={FADE} fontFamily={SERIF} fontSize={17.5} fontWeight={600}>
-            {parts.map((p, j) => (
-              <tspan key={j} fill={p.fill || INK} fontWeight={p.b ? 700 : 600}>{p.t}</tspan>
-            ))}
-          </text>
-        ))}
-      </svg>
-    </div>
   )
 }
 
@@ -87,7 +63,7 @@ export default function DirectedLab({ mode, stage = 99 }) {
   /* ---- 1 · 有向數概念 ---- */
   if (mode === 'number_line') {
     return (
-      <Stage title="有向數 · 數線" stage={stage} ds={3}
+      <LabStage title="有向數 · 數線" stage={stage} ds={3}
         lines={[
           [{ t: '正數：大過 0，向右行　（例：+5）', fill: BLUE }],
           [{ t: '負數：細過 0，向左行　（例：−3）', fill: RED }],
@@ -105,14 +81,14 @@ export default function DirectedLab({ mode, stage = 99 }) {
           <Dot v={5} fill={BLUE} label="+5" />
           <Dot v={-3} fill={RED} label="−3" />
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 2 · 相反數 ---- */
   if (mode === 'opposite') {
     return (
-      <Stage title="相反數 · +5 同 −5" stage={stage} ds={2}
+      <LabStage title="相反數 · +5 同 −5" stage={stage} ds={2}
         lines={[
           [{ t: '+5 同 −5 隔住 0 對望，距離一樣 — 互為相反數' }],
           [{ t: '負負得正：−(−7) = 7', fill: GOLD, b: true }],
@@ -126,14 +102,14 @@ export default function DirectedLab({ mode, stage = 99 }) {
           <path d="M 105 128 C 160 92, 290 92, 348 128" fill="none" stroke={GOLD} strokeWidth={2} strokeDasharray="6 5" />
         </g>
         <Text x={225} y={100} size={16} fill={GOLD} w={700} opacity={on(2, stage)}>互為相反數</Text>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 3 · 加正數：向右 ---- */
   if (mode === 'add_pos') {
     return (
-      <Stage title="加正數 · (−2) + 5" stage={stage} ds={2}
+      <LabStage title="加正數 · (−2) + 5" stage={stage} ds={2}
         lines={[
           [{ t: '由 −2 出發，向右行 5 格：−1 → 0 → 1 → 2 → 3' }],
           [{ t: '(−2) + 5 = ' }, { t: '+3', fill: GOLD, b: true }],
@@ -150,14 +126,14 @@ export default function DirectedLab({ mode, stage = 99 }) {
           <Text x={240} y={92} size={15} fill={GOLD} w={700}>向右 5 格</Text>
           <Dot v={3} fill={GOLD} label="+3" />
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 4 · 加負數：向左 ---- */
   if (mode === 'add_neg') {
     return (
-      <Stage title="加負數 · (+3) + (−4)" stage={stage} ds={2}
+      <LabStage title="加負數 · (+3) + (−4)" stage={stage} ds={2}
         lines={[
           [{ t: '由 +3 出發，向左行 4 格：2 → 1 → 0 → −1' }],
           [{ t: '(+3) + (−4) = ' }, { t: '−1', fill: GOLD, b: true }],
@@ -174,14 +150,14 @@ export default function DirectedLab({ mode, stage = 99 }) {
           <Text x={262} y={92} size={15} fill={RED} w={700}>向左 4 格</Text>
           <Dot v={-1} fill={RED} label="−1" />
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 5 · 減 = 加相反數 ---- */
   if (mode === 'subtract') {
     return (
-      <Stage title="減法秘技 · 減 = 加相反數" stage={stage} ds={2}
+      <LabStage title="減法秘技 · 減 = 加相反數" stage={stage} ds={2}
         lines={[
           [{ t: '2 − (−3) 唔好死諗——減一個負數，即係加佢嘅相反數' }],
           [{ t: '2 − (−3) = 2 + (+3) = ' }, { t: '5', fill: GOLD, b: true }],
@@ -198,7 +174,7 @@ export default function DirectedLab({ mode, stage = 99 }) {
         <g opacity={on(2, stage)}>
           <Text x={215} y={222} size={38} fill={GOLD} w={700}>= 5</Text>
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
@@ -211,7 +187,7 @@ export default function DirectedLab({ mode, stage = 99 }) {
       ['(−) × (−)', '+', OK, 225, 190],
     ]
     return (
-      <Stage title="乘法 · 同號得正，異號得負" stage={stage} ds={2}
+      <LabStage title="乘法 · 同號得正，異號得負" stage={stage} ds={2}
         lines={[
           [{ t: '(−3) × (−4)：負 × 負 → 同號 → 得正' }],
           [{ t: '(−3) × (−4) = ' }, { t: '+12', fill: GOLD, b: true }],
@@ -231,17 +207,14 @@ export default function DirectedLab({ mode, stage = 99 }) {
         <g opacity={on(1, stage)}>
           <rect x={225} y={190} width={165} height={56} rx={12} fill="rgba(251,191,36,0.10)" stroke={GOLD} strokeWidth={2.2} />
         </g>
-        <g opacity={on(2, stage)}>
-          <Text x={215} y={296} size={22} fill={GOLD} w={700}>例：(−3) × (−4) = +12</Text>
-        </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 7 · 除法 ---- */
   if (mode === 'divide') {
     return (
-      <Stage title="除法 · 符號法則同乘法一樣" stage={stage} ds={2}
+      <LabStage title="除法 · 符號法則同乘法一樣" stage={stage} ds={2}
         lines={[
           [{ t: '同號相除得正：(−12) ÷ (−4) = ' }, { t: '+3', fill: GOLD, b: true }],
           [{ t: '異號相除得負：12 ÷ (−4) = ' }, { t: '−3', fill: GOLD, b: true }],
@@ -261,14 +234,14 @@ export default function DirectedLab({ mode, stage = 99 }) {
           <Text x={312} y={146} size={19}>12 ÷ (−4)</Text>
           <Text x={312} y={172} size={20} fill={RED} w={700}>= −3</Text>
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 8 · 混合運算 ---- */
   if (mode === 'mixed_ops') {
     return (
-      <Stage title="混合運算 · 先乘除後加減" stage={stage} ds={2}
+      <LabStage title="混合運算 · 先乘除後加減" stage={stage} ds={2}
         lines={[
           [{ t: '原式：(−2) + 3 × (−4)' }],
           [{ t: '先乘：3 × (−4) = −12 → (−2) + (−12)' }],
@@ -284,14 +257,14 @@ export default function DirectedLab({ mode, stage = 99 }) {
         <g opacity={on(2, stage)}>
           <Text x={215} y={215} size={24}>(−2) + (−12)</Text>
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 9 · 應用：氣溫 ---- */
   if (mode === 'real_life') {
     return (
-      <Stage title="應用 · 氣溫變化" stage={stage} ds={2}
+      <LabStage title="應用 · 氣溫變化" stage={stage} ds={2}
         lines={[
           [{ t: '昨晚 −5°C，今早升咗 8°C' }],
           [{ t: '(−5) + 8 = ' }, { t: '+3', fill: GOLD, b: true }, { t: '　→ 今早 +3°C', fill: MUTED }],
@@ -308,7 +281,7 @@ export default function DirectedLab({ mode, stage = 99 }) {
           <Text x={205} y={88} size={15} fill={GOLD} w={700}>上升 8°C</Text>
           <Dot v={3} fill={GOLD} label="+3°C" />
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
@@ -324,7 +297,7 @@ export default function DirectedLab({ mode, stage = 99 }) {
       </g>
     )
     return (
-      <Stage title="常犯錯誤 · 千祈唔好中招" stage={stage} ds={2}
+      <LabStage title="常犯錯誤 · 千祈唔好中招" stage={stage} ds={2}
         lines={[
           [{ t: '錯誤 1：−3 + 5 唔係 −8 —— 5 大過 3，跟 5 嘅正號 → +2' }],
           [{ t: '錯誤 2：(−2)² = (−2) × (−2) = +4，唔係 −4' }],
@@ -333,8 +306,8 @@ export default function DirectedLab({ mode, stage = 99 }) {
       >
         {card(25, '−3 + 5 = −8', '−3 + 5 = +2', on(0, stage))}
         {card(230, '(−2)² = −4', '(−2)² = +4', on(1, stage))}
-        <Text x={215} y={278} size={16} fill={GOLD} w={700} opacity={on(2, stage)}>符號同平方，係有向數兩大陷阱</Text>
-      </Stage>
+        <Text x={215} y={255} size={16} fill={GOLD} w={700} opacity={on(2, stage)}>符號同平方，係有向數兩大陷阱</Text>
+      </LabStage>
     )
   }
 
@@ -350,7 +323,7 @@ export default function DirectedLab({ mode, stage = 99 }) {
     const POS = [[16, 55], [152, 55], [288, 55], [84, 185], [220, 185]]
     return (
       <div className="idx-lab">
-        <svg className="vm-svg" viewBox="0 0 430 330" role="img" aria-label="第二章有向數總結">
+        <svg className="vm-svg" viewBox="0 0 430 382" role="img" aria-label="第二章有向數總結">
           {CARDS.map(([num, t, ex], i) => (
             <g key={num} opacity={on(i, stage)} style={FADE}>
               <rect x={POS[i][0]} y={POS[i][1]} width={126} height={112} rx={14} fill="rgba(255,255,255,0.05)" stroke="rgba(242,245,255,0.18)" strokeWidth={1.4} />

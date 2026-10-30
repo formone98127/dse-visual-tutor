@@ -1,6 +1,7 @@
 import { GOLD, BLUE, OK, RED, INK, MUTED, LINE, SERIF } from '../lib/palette.js'
 import { clamp01 } from '../lib/labMotion.js'
 import { NumBox, NumberedCard } from './LabBits.jsx'
+import LabStage, { on, FADE } from './LabStage.jsx'
 
 /**
  * K1 基本運算 lab — 逐步推演（stage 驅動，唔係自動播放）。
@@ -30,37 +31,12 @@ function Frac({ x, y, n, d, size = 24, fill = INK, w = 22 }) {
 }
 
 /** 圖形/行嘅顯示狀態：stage >= k → 1，否則 0（CSS transition 負責淡入） */
-const on = (k, stage) => (stage >= k ? 1 : 0)
-const FADE = { transition: 'opacity 0.4s ease' }
-
-/** 舞台：細標題 + 圖形（上置縮放）+ 推演行 */
-function Stage({ title, stage, children, lines = [], ds = 0 }) {
-  return (
-    <div className="idx-lab">
-      <svg className="vm-svg" viewBox="0 0 430 330" role="img">
-        <text x={215} y={26} textAnchor="middle" fontSize={25} fill={GOLD} fontWeight={700}
-          fontFamily={SERIF} letterSpacing={2}>
-          {title}
-        </text>
-        <g transform="translate(60.2 18.2) scale(0.72)">{children}</g>
-        {lines.map((parts, i) => (
-          <text key={i} x={50} y={266 + i * 27} opacity={on(ds + i, stage)}
-            style={FADE} fontFamily={SERIF} fontSize={17.5} fontWeight={600}>
-            {parts.map((p, j) => (
-              <tspan key={j} fill={p.fill || INK} fontWeight={p.b ? 700 : 600}>{p.t}</tspan>
-            ))}
-          </text>
-        ))}
-      </svg>
-    </div>
-  )
-}
 
 export default function BasicLab({ mode, stage = 99 }) {
   /* ---- 1 · 整除性 4：316（steps 4：數字 → 底線 → 行1 → 行2 → 行3） ---- */
   if (mode === 'div4') {
     return (
-      <Stage title="整除性檢驗 ① · ÷4" stage={stage} ds={2}
+      <LabStage title="整除性檢驗 ① · ÷4" stage={stage} ds={2}
         lines={[
           [{ t: '尾兩位 16 ÷ 4 = 4 無餘數 ' }, { t: '✓', fill: OK, b: true }],
           [{ t: '∴ 316 係 4 嘅倍數，' }, { t: '316 ÷ 4 = 79', fill: GOLD, b: true }],
@@ -78,14 +54,14 @@ export default function BasicLab({ mode, stage = 99 }) {
           <Text x={238} y={192} size={16} fill={MUTED}>尾兩位</Text>
         </g>
         <Text x={215} y={262} size={30} fill={OK} w={700} opacity={on(2, stage)} style={FADE}>✓</Text>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 2 · 整除性 8：1,024 ---- */
   if (mode === 'div8') {
     return (
-      <Stage title="整除性檢驗 ② · ÷8" stage={stage} ds={2}
+      <LabStage title="整除性檢驗 ② · ÷8" stage={stage} ds={2}
         lines={[
           [{ t: '尾三位 024 即 24，24 ÷ 8 = 3 無餘數 ' }, { t: '✓', fill: OK, b: true }],
           [{ t: '∴ 1,024 係 8 嘅倍數，' }, { t: '1,024 ÷ 8 = 128', fill: GOLD, b: true }],
@@ -103,7 +79,7 @@ export default function BasicLab({ mode, stage = 99 }) {
           <Text x={286} y={192} size={16} fill={MUTED}>尾三位 = 24</Text>
         </g>
         <Text x={215} y={262} size={30} fill={OK} w={700} opacity={on(2, stage)} style={FADE}>✓</Text>
-      </Stage>
+      </LabStage>
     )
   }
 
@@ -115,7 +91,7 @@ export default function BasicLab({ mode, stage = 99 }) {
       { x: 270, d: '7' },
     ]
     return (
-      <Stage title="整除性檢驗 ③ · ÷9 睇數字和" stage={stage} ds={4}
+      <LabStage title="整除性檢驗 ③ · ÷9 睇數字和" stage={stage} ds={4}
         lines={[
           [{ t: '數字和 4 + 7 + 7 = 18 → 1 + 8 = 9 ' }, { t: '✓', fill: OK, b: true }],
           [{ t: '∴ 477 係 9 嘅倍數，' }, { t: '477 ÷ 9 = 53', fill: GOLD, b: true }],
@@ -132,7 +108,7 @@ export default function BasicLab({ mode, stage = 99 }) {
           <path d="M 215 145 L 215 175 M 208 168 L 215 178 L 222 168" fill="none" stroke={MUTED} strokeWidth={2} />
           <Text x={215} y={218} size={30} fill={GOLD} w={700}>4 + 7 + 7 = 18</Text>
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
@@ -147,7 +123,7 @@ export default function BasicLab({ mode, stage = 99 }) {
       </g>
     )
     return (
-      <Stage title="整除性檢驗 ④ · ÷6 = 過兩關" stage={stage} ds={3}
+      <LabStage title="整除性檢驗 ④ · ÷6 = 過兩關" stage={stage} ds={3}
         lines={[
           [{ t: '第一關 俾 2：尾位 8 係雙數 ✓' }],
           [{ t: '第二關 俾 3：2 + 5 + 8 = 15，15 ÷ 3 ✓' }],
@@ -159,14 +135,14 @@ export default function BasicLab({ mode, stage = 99 }) {
         </g>
         {card(25, '第一關 · 俾 2 整除', '258 尾位係 8', '雙數 ✓', on(1, stage))}
         {card(235, '第二關 · 俾 3 整除', '2+5+8 = 15', '15 ÷ 3 ✓', on(2, stage))}
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 5 · 冪 ---- */
   if (mode === 'power') {
     return (
-      <Stage title="冪 · aⁿ = n 個 a 相乘" stage={stage} ds={4}
+      <LabStage title="冪 · aⁿ = n 個 a 相乘" stage={stage} ds={4}
         lines={[
           [{ t: '2³ = 2 × 2 × 2 = ' }, { t: '8', fill: GOLD, b: true }, { t: '　　5² = 5 × 5 = ' }, { t: '25', fill: GOLD, b: true }],
           [{ t: '10⁴ = 10 × 10 × 10 × 10 = ' }, { t: '10 000', fill: GOLD, b: true }],
@@ -189,7 +165,7 @@ export default function BasicLab({ mode, stage = 99 }) {
         <g opacity={on(3, stage)} style={FADE}>
           <Text x={310} y={196} size={38} fill={GOLD} w={700}>{'= 8'}</Text>
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
@@ -206,7 +182,7 @@ export default function BasicLab({ mode, stage = 99 }) {
       <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={MUTED} strokeWidth={1.6} opacity={op} style={FADE} />
     )
     return (
-      <Stage title="質因數分解 · 60 = ?" stage={stage} ds={4}
+      <LabStage title="質因數分解 · 60 = ?" stage={stage} ds={4}
         lines={[
           [{ t: '60 = 2 × 2 × 3 × 5 = ' }, { t: '2² × 3 × 5', fill: GOLD, b: true }],
           [{ t: '一路拆，拆到淨係剩質數（金圈）先停' }],
@@ -232,14 +208,14 @@ export default function BasicLab({ mode, stage = 99 }) {
           <Node x={298} y={268} t="3" prime op={1} />
           <Node x={392} y={268} t="5" prime op={1} />
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 7 · HCF ---- */
   if (mode === 'hcf') {
     return (
-      <Stage title="HCF(12, 18) · 只攞「共有」" stage={stage} ds={4}
+      <LabStage title="HCF(12, 18) · 只攞「共有」" stage={stage} ds={4}
         lines={[
           [{ t: '12 = 2 × 2 × ' }, { t: '3', fill: GOLD, b: true }, { t: '　　18 = ' }, { t: '2', fill: GOLD, b: true }, { t: ' × 3 × 3' }],
           [{ t: '共有嘅質因數：2、3 → HCF = 2 × 3 = ' }, { t: '6', fill: GOLD, b: true }],
@@ -267,14 +243,14 @@ export default function BasicLab({ mode, stage = 99 }) {
           </g>
           <circle cx={215} cy={152} r={44} fill="none" stroke={OK} strokeWidth={2.5} strokeDasharray="6 5" />
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 8 · LCM ---- */
   if (mode === 'lcm') {
     return (
-      <Stage title="LCM(12, 18) · 攞「全部」" stage={stage} ds={3}
+      <LabStage title="LCM(12, 18) · 攞「全部」" stage={stage} ds={3}
         lines={[
           [{ t: '全部質因數都要：2、2、3、3' }],
           [{ t: 'LCM = 2 × 2 × 3 × 3 = ' }, { t: '36', fill: GOLD, b: true }],
@@ -298,14 +274,14 @@ export default function BasicLab({ mode, stage = 99 }) {
         <g opacity={on(2, stage)} style={FADE}>
           <rect x={44} y={50} width={342} height={145} rx={16} fill="none" stroke={OK} strokeWidth={2.5} strokeDasharray="7 6" />
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 9 · 分數乘法 ---- */
   if (mode === 'frac_mul') {
     return (
-      <Stage title="分數乘法 · 2/3 × 3/4" stage={stage} ds={2}
+      <LabStage title="分數乘法 · 2/3 × 3/4" stage={stage} ds={2}
         lines={[
           [{ t: '分子乘分子：2 × 3 = 6；分母乘分母：3 × 4 = 12' }],
           [{ t: '2/3 × 3/4 = 6/12，約分（÷6）= ' }, { t: '1/2', fill: GOLD, b: true }],
@@ -322,14 +298,14 @@ export default function BasicLab({ mode, stage = 99 }) {
           <Text x={215} y={198} size={24} fill={MUTED}>{'='}</Text>
           <Frac x={300} y={200} n="1" d="2" size={24} fill={GOLD} />
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 10 · 分數加法 ---- */
   if (mode === 'frac_add') {
     return (
-      <Stage title="分數加法 · 同分母 / 異分母" stage={stage} ds={2}
+      <LabStage title="分數加法 · 同分母 / 異分母" stage={stage} ds={2}
         lines={[
           [{ t: '同分母：分母唔變，分子相加 → 2/2 = ' }, { t: '1', fill: GOLD, b: true }],
           [{ t: '異分母：先用 LCM 通分（2 同 3 嘅 LCM = 6）', fill: MUTED }],
@@ -348,14 +324,14 @@ export default function BasicLab({ mode, stage = 99 }) {
           <Frac x={250} y={210} n="1" d="3" size={26} />
           <Text x={315} y={208} size={28} fill={GOLD} w={700}>{'= 5/6'}</Text>
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 11 · 混合運算 ---- */
   if (mode === 'mixed') {
     return (
-      <Stage title="混合運算 · 1/2 + 2/3 × 3/4" stage={stage} ds={3}
+      <LabStage title="混合運算 · 1/2 + 2/3 × 3/4" stage={stage} ds={3}
         lines={[
           [{ t: '先乘：2/3 × 3/4 = 1/2' }],
           [{ t: '後加：1/2 + 1/2 = 2/2 = ' }, { t: '1', fill: GOLD, b: true }],
@@ -375,14 +351,14 @@ export default function BasicLab({ mode, stage = 99 }) {
         <g opacity={on(2, stage)} style={FADE}>
           <Text x={215} y={240} size={30} fill={OK} w={700}>= 1 ✓</Text>
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 冪 · 展開練習 ---- */
   if (mode === 'power_expand') {
     return (
-      <Stage title="冪 · 展開三條" stage={stage} ds={3}
+      <LabStage title="冪 · 展開三條" stage={stage} ds={3}
         lines={[
           [{ t: '每條都係：指數 = 乘幾多次' }],
           [{ t: '底數唔同、指數唔同，都係同一套玩法', fill: MUTED }],
@@ -397,7 +373,7 @@ export default function BasicLab({ mode, stage = 99 }) {
         <g opacity={on(2, stage)} style={FADE}>
           <Text x={215} y={240} size={26} w={700}>10⁴ = 10 × 10 × 10 × 10 = 10 000</Text>
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
@@ -406,7 +382,7 @@ export default function BasicLab({ mode, stage = 99 }) {
     const SQ = [[1, 1], [2, 4], [3, 9], [4, 16], [5, 25], [6, 36], [7, 49], [8, 64], [9, 81], [10, 100], [11, 121], [12, 144]]
     const CB = [[2, 8], [3, 27], [4, 64], [5, 125]]
     return (
-      <Stage title="背呢頁 · 常用平方數與立方數" stage={stage} ds={3}
+      <LabStage title="背呢頁 · 常用平方數與立方數" stage={stage} ds={3}
         lines={[
           [{ t: '11² = 121、12² = 144 最常考，一定要背' }],
           [{ t: '立方常用四個：8、27、64、125', fill: MUTED }],
@@ -433,14 +409,14 @@ export default function BasicLab({ mode, stage = 99 }) {
             <Text x={20 + i * 100 + 46} y={248} size={18} w={700}>{v}</Text>
           </g>
         ))}
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 冪 · 2³ vs 3² 對比 ---- */
   if (mode === 'power_compare') {
     return (
-      <Stage title="小心比較 · 2³ vs 3²" stage={stage} ds={3}
+      <LabStage title="小心比較 · 2³ vs 3²" stage={stage} ds={3}
         lines={[
           [{ t: '底同指數調轉，結果唔同：8 ≠ 9' }],
           [{ t: '2³ 讀「2 的 3 次方」；3² 讀「3 的 2 次方」' }],
@@ -462,28 +438,39 @@ export default function BasicLab({ mode, stage = 99 }) {
         <g opacity={on(2, stage)}>
           <Text x={215} y={248} size={24} fill={GOLD} w={700}>8 ≠ 9 — 唔一樣！</Text>
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 質數與合數 ---- */
   if (mode === 'primes') {
     const NUMS = [[2, 1], [3, 1], [4, 0], [5, 1], [6, 0], [7, 1], [8, 0], [9, 0], [10, 0], [11, 1], [12, 0], [13, 1], [14, 0], [15, 0], [16, 0]]
+    // 5×3 格：固定喺圖形區上半，唔好撞到底部說明行
+    const COLS = 5
+    const BOX_W = 64
+    const BOX_H = 48
+    const GAP_X = 12
+    const GAP_Y = 12
+    const GRID_W = COLS * BOX_W + (COLS - 1) * GAP_X
+    const ORIGIN_X = Math.round((430 - GRID_W) / 2)
+    const ORIGIN_Y = 52
     return (
-      <Stage title="質數 vs 合數 · 2 到 16" stage={stage} ds={2}
+      <LabStage title="質數 vs 合數 · 2 到 16" stage={stage} ds={2}
         lines={[
           [{ t: '質數：只有 1 同自己兩個因數 — 2、3、5、7、11、13', fill: GOLD, b: true }],
           [{ t: '合數：因數多過兩個 — 4、6、8、9、10、12、14、15、16' }],
-          [{ t: '1 既唔係質數亦唔係合數', fill: MUTED }],
+          [{ t: '1 既唔係質數亦唔係合數 · 金色格 = 質數', fill: MUTED }],
         ]}
       >
         {NUMS.map(([v, prime], i) => {
-          const x = 24 + (i % 5) * 78
-          const y = 70 + Math.floor(i / 5) * 68
+          const col = i % COLS
+          const row = Math.floor(i / COLS)
+          const x = ORIGIN_X + col * (BOX_W + GAP_X)
+          const y = ORIGIN_Y + row * (BOX_H + GAP_Y)
           return (
             <NumBox
               key={v}
-              x={x} y={y} w={62} h={54}
+              x={x} y={y} w={BOX_W} h={BOX_H}
               label={v}
               labelSize={22}
               labelFill={prime ? GOLD : MUTED}
@@ -494,15 +481,14 @@ export default function BasicLab({ mode, stage = 99 }) {
             />
           )
         })}
-        <Text x={215} y={268} size={17} fill={GOLD} w={700} opacity={on(1, stage)}>金色 = 質數（因數只有 1 同自己）</Text>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 質因數分解 · 短除法 ---- */
   if (mode === 'short_div') {
     return (
-      <Stage title="短除法 · 60 = ?" stage={stage} ds={4}
+      <LabStage title="短除法 · 60 = ?" stage={stage} ds={4}
         lines={[
           [{ t: '60 = 2 × 2 × 3 × 5 = ' }, { t: '2² × 3 × 5', fill: GOLD, b: true }],
           [{ t: '同分解樹一樣答案——鍾意邊種用邊種', fill: MUTED }],
@@ -525,14 +511,14 @@ export default function BasicLab({ mode, stage = 99 }) {
         <g opacity={on(3, stage)} style={FADE}>
           <Text x={215} y={268} size={26} fill={GOLD} w={700}>60 = 2² × 3 × 5</Text>
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 質因數分解 · 點解要拆 ---- */
   if (mode === 'factor_why') {
     return (
-      <Stage title="點解要拆 · 84 嘅例子" stage={stage} ds={3}
+      <LabStage title="點解要拆 · 84 嘅例子" stage={stage} ds={3}
         lines={[
           [{ t: '每個合數嘅質因數分解得一份（唯一）' }],
           [{ t: 'HCF、LCM、約分、通分——全部靠佢', fill: MUTED }],
@@ -549,14 +535,14 @@ export default function BasicLab({ mode, stage = 99 }) {
         <g opacity={on(2, stage)} style={FADE}>
           <Text x={215} y={274} size={16} fill={MUTED}>無論你點拆，最後都係呢串質因數</Text>
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 短除法一石二鳥：HCF + LCM（12, 18） ---- */
   if (mode === 'short_both') {
     return (
-      <Stage title="短除法一石二鳥 · HCF 同 LCM 一次過" stage={stage} ds={5}
+      <LabStage title="短除法一石二鳥 · HCF 同 LCM 一次過" stage={stage} ds={5}
         lines={[
           [{ t: 'HCF（左邊乘埋）= 2 × 3 = ' }, { t: '6', fill: GOLD, b: true }],
           [{ t: 'LCM（左邊 × 底行）= 2 × 3 × 2 × 3 = ' }, { t: '36', fill: GOLD, b: true }],
@@ -577,7 +563,7 @@ export default function BasicLab({ mode, stage = 99 }) {
         <g opacity={on(4, stage)} style={FADE}>
           <Text x={110} y={266} size={22} fill={BLUE} w={700}>LCM = 2 × 3 × 2 × 3 = 36（連底行乘埋）</Text>
         </g>
-      </Stage>
+      </LabStage>
     )
   }
 
@@ -593,7 +579,7 @@ export default function BasicLab({ mode, stage = 99 }) {
       </g>
     )
     return (
-      <Stage title="應用 · 幾時用 HCF 幾時用 LCM" stage={stage} ds={3}
+      <LabStage title="應用 · 幾時用 HCF 幾時用 LCM" stage={stage} ds={3}
         lines={[
           [{ t: '剪到「最長」等長 → HCF（要啱啱好分得勻）' }],
           [{ t: '下次「再一齊」發生 → LCM（一同例必係公倍數）' }],
@@ -603,14 +589,14 @@ export default function BasicLab({ mode, stage = 99 }) {
         {appCard(25, '剪絲帶 · 用 HCF', '兩條絲帶 12cm、18cm', '剪成最長嘅等長段？', OK, on(0, stage))}
         {appCard(230, '閃燈 · 用 LCM', '甲燈每 12 分鐘閃', '乙燈每 18 分鐘閃，下次同閃？', GOLD, on(1, stage))}
         <Text x={215} y={268} size={18} fill={GOLD} w={700} opacity={on(2, stage)}>答：6cm　·　36 分鐘後</Text>
-      </Stage>
+      </LabStage>
     )
   }
 
   /* ---- 分數比大小 ---- */
   if (mode === 'frac_compare') {
     return (
-      <Stage title="比大小 · 3/4 vs 5/6" stage={stage} ds={3}
+      <LabStage title="比大小 · 3/4 vs 5/6" stage={stage} ds={3}
         lines={[
           [{ t: '通分：LCM(4, 6) = 12 → 3/4 = 9/12　·　5/6 = 10/12' }],
           [{ t: '10/12 > 9/12 → ' }, { t: '5/6 較大', fill: GOLD, b: true }],
@@ -628,7 +614,7 @@ export default function BasicLab({ mode, stage = 99 }) {
           <Frac x={300} y={200} n="10" d="12" size={24} fill={GOLD} />
         </g>
         <Text x={215} y={272} size={24} fill={GOLD} w={700} opacity={on(2, stage)}>5/6 大過 3/4 ✓</Text>
-      </Stage>
+      </LabStage>
     )
   }
 
@@ -644,7 +630,7 @@ export default function BasicLab({ mode, stage = 99 }) {
     const POS = [[16, 55], [152, 55], [288, 55], [84, 185], [220, 185]]
     return (
       <div className="idx-lab">
-        <svg className="vm-svg" viewBox="0 0 430 330" role="img" aria-label="第一章五件工具總結">
+        <svg className="vm-svg" viewBox="0 0 430 382" role="img" aria-label="第一章五件工具總結">
           {CARDS.map(([num, t, ex], i) => (
             <NumberedCard
               key={num}

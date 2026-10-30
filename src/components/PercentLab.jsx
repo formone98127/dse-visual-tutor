@@ -30,7 +30,7 @@ const FADE = { transition: 'opacity 0.4s ease' }
 function Stage({ title, stage, children, lines = [], ds = 0 }) {
   return (
     <div className="idx-lab">
-      <svg className="vm-svg" viewBox="0 0 430 330" role="img">
+      <svg className="vm-svg" viewBox="0 0 430 382" role="img">
         <text x={215} y={26} textAnchor="middle" fontSize={25} fill={GOLD} fontWeight={700}
           fontFamily={SERIF} letterSpacing={2}>
           {title}
@@ -288,7 +288,7 @@ export default function PercentLab({ mode, stage = 99 }) {
     const POS = [[16, 55], [152, 55], [288, 55], [84, 185], [220, 185]]
     return (
       <div className="idx-lab">
-        <svg className="vm-svg" viewBox="0 0 430 330" role="img" aria-label="第五章百分數總結">
+        <svg className="vm-svg" viewBox="0 0 430 382" role="img" aria-label="第五章百分數總結">
           {CARDS.map(([num, t, ex], i) => (
             <NumberedCard key={num} x={POS[i][0]} y={POS[i][1]} num={num} title={t} note={ex} op={on(i, stage)} />
           ))}

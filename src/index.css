@@ -44,11 +44,14 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 .vm-svg {
   width: 100%;
   height: 100%;
-  overflow: visible;
+  overflow: hidden;
+  max-width: 100%;
+  max-height: 100%;
 }
 .idx-chip {
   cursor: pointer;
@@ -133,6 +136,307 @@ body {
 }
 .syllabus-in {
   animation: syllabus-in 0.35s ease both;
+}
+
+/* ---- Lab 動態：彈入 / 劃線 / 脈衝（淨係圖內用，唔加多餘裝飾） ---- */
+@keyframes lab-pop {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes lab-draw {
+  from {
+    stroke-dashoffset: 120;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes lab-pulse-soft {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes lab-flow {
+  from {
+    stroke-dashoffset: 24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.lab-pop {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: lab-pop 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.lab-pop-d1 {
+  animation-delay: 0.08s;
+}
+.lab-pop-d2 {
+  animation-delay: 0.16s;
+}
+.lab-pop-d3 {
+  animation-delay: 0.24s;
+}
+.lab-pop-d4 {
+  animation-delay: 0.32s;
+}
+.lab-draw {
+  stroke-dasharray: 120;
+  animation: lab-draw 0.7s ease forwards;
+}
+.lab-pulse {
+  animation: lab-pulse-soft 1.8s ease-in-out infinite;
+}
+.lab-flow {
+  stroke-dasharray: 6 6;
+  animation: lab-flow 0.9s linear infinite;
+}
+
+/* ---- 動態化：場景元素入場（畫線 / 彈入 / 生高）+ 環境微動效 ---- */
+@keyframes fx-pop-kf {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.75);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes fx-pop-soft-kf {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fx-rise-kf {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fx-grow-y-kf {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+@keyframes fx-shake-in-kf {
+  from {
+    opacity: 0;
+    transform: translateX(0) scale(0.6);
+  }
+  30% {
+    opacity: 1;
+    transform: translateX(-5px) scale(1.05);
+  }
+  55% {
+    transform: translateX(4px);
+  }
+  75% {
+    transform: translateX(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+@keyframes fx-draw-kf {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes fx-march-kf {
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+.fx-pop,
+.fx-rise,
+.fx-pop-bounce,
+.fx-shake-in,
+.fx-grow-y {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.fx-pop {
+  animation: fx-pop-kf 0.5s cubic-bezier(0.22, 1.4, 0.36, 1) both;
+}
+.fx-pop-bounce {
+  animation: fx-pop-kf 0.55s cubic-bezier(0.22, 1.6, 0.36, 1) both;
+}
+.fx-rise {
+  animation: fx-rise-kf 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.fx-shake-in {
+  animation: fx-shake-in-kf 0.5s ease-out both;
+}
+.fx-grow-y {
+  transform-origin: 50% 100%;
+  animation: fx-grow-y-kf 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.fx-draw {
+  stroke-dasharray: 1;
+  animation: fx-draw-kf 0.7s ease-out both;
+}
+.fx-march {
+  animation: fx-march-kf 1.4s linear infinite;
+}
+
+/* 舊 labs 嘅元素（冇專屬 class）：一可見就輕輕彈入；:where 令專屬 class 一定贏。
+   淨睇 opacity=1 或冇寫 opacity 嘅——半透明（0.5/0.25 等）唔好郁，否則會俾 keyframe 鎖死做全實。
+   亦要排除已有 transform 嘅（例如自動置中嘅 wrapper），否則動畫會蓋掉定位。 */
+:where(.fx-diag) > *:where(:not([opacity]), [opacity='1']):where(:not([transform])) {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fx-pop-soft-kf 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* 字幕 / 標題 / 換頁 */
+@keyframes caption-in-kf {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.caption-in {
+  animation: caption-in-kf 0.35s ease-out both;
+}
+@keyframes title-in-kf {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.title-in {
+  animation: title-in-kf 0.5s ease-out both;
+}
+@keyframes stage-in-kf {
+  from {
+    opacity: 0.3;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.stage-in {
+  animation: stage-in-kf 0.45s ease-out both;
+}
+
+/* 環境微動效：燈光呼吸 · 格線漂移 · 進度條流光 · 提示郁動 · 圓點脈衝 */
+@keyframes breathe-kf {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.spotlight-breathe {
+  animation: breathe-kf 7s ease-in-out infinite;
+}
+@keyframes grid-drift-kf {
+  from {
+    background-position:
+      0 0,
+      0 0;
+  }
+  to {
+    background-position:
+      48px 48px,
+      48px 48px;
+  }
+}
+.grid-drift {
+  animation: grid-drift-kf 24s linear infinite;
+}
+@keyframes progress-shine-kf {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+.progress-shine {
+  background-image: linear-gradient(90deg, transparent 30%, rgba(255, 255, 255, 0.55) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: progress-shine-kf 2.8s linear infinite;
+}
+@keyframes hint-bob-kf {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+}
+.hint-bob {
+  display: inline-block;
+  animation: hint-bob-kf 1.6s ease-in-out infinite;
+}
+@keyframes dot-pulse-kf {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+}
+.dot-active-pulse {
+  animation: dot-pulse-kf 1.4s ease-in-out infinite;
+}
+
+/* 尊重系統「減少動態效果」設定 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* ---- 字幕 phase badge（題目 cyan / 已知條件 gold / 問咩 pink / 點解·驗證 green / 到你 pink） ---- */
