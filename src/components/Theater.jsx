@@ -136,8 +136,6 @@ export default function Theater({
   total = 0,
   steps = 1,
   onInteractComplete,
-  gateLocked = false,
-  gateHint = null,
 }) {
   const { snap, visible } = useStageSnapshot({ beat, lesson, pendingTitle, mode })
   const Lab = snap.lesson ? LABS[snap.lesson.lab] : null
@@ -271,11 +269,7 @@ export default function Theater({
         )}
       </div>
 
-      {gateLocked && gateHint && (
-        <div className="pointer-events-none absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-[120%] rounded-full border border-amber-400/40 bg-black/75 px-4 py-1.5 text-[11px] font-bold tracking-wide text-amber-300 backdrop-blur">
-          {gateHint}
-        </div>
-      )}
+      {/* gate 提示只放 ControlDeck 字幕區，唔再蓋住舞台中間嘅圖 */}
 
       {/* 右下角資訊列：滑動提示(手機) / 快速鍵(桌面) + 頁內圓點 + 頁數
           —— 放入舞台範圍，唔跟內容淡化；右下角觀景窗標記讓位俾佢 */}
