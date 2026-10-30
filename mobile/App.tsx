@@ -14,9 +14,9 @@ import Constants from 'expo-constants';
 /**
  * Phone app = thin shell around the SAME website as the web tutor.
  * Content always lives in the web project (`src/data/*`).
- * After you push to main, GitHub Pages updates → every phone sees the new lessons.
+ * After the live site updates, every phone sees the new lessons.
  */
-const PRODUCTION_TUTOR_URL = 'https://formone98127.github.io/dse-visual-tutor/';
+const PRODUCTION_TUTOR_URL = 'https://dsemaths.canonlessons.com/';
 
 function resolveBaseTutorUrl(): string {
   const extra = Constants.expoConfig?.extra ?? {};

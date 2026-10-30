@@ -7,7 +7,7 @@ import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const EXPECTED = 'https://formone98127.github.io/dse-visual-tutor/'
+const EXPECTED = 'https://dsemaths.canonlessons.com/'
 
 const appJson = JSON.parse(readFileSync(resolve(root, 'mobile/app.json'), 'utf8'))
 const appTsx = readFileSync(resolve(root, 'mobile/App.tsx'), 'utf8')
@@ -26,7 +26,7 @@ say(
   typeof tutorUrl === 'string' && tutorUrl.replace(/\/?$/, '/') === EXPECTED,
   `app.json tutorUrl → ${tutorUrl}`,
 )
-say(appTsx.includes(EXPECTED), 'App.tsx production URL matches GitHub Pages')
+say(appTsx.includes(EXPECTED), 'App.tsx production URL → dsemaths.canonlessons.com')
 say(!!stampMatch, `content stamp → ${stampMatch?.[1] ?? '(missing)'}`)
 say(
   appTsx.includes('content-version.json') && appTsx.includes('cacheEnabled={false}'),
@@ -35,7 +35,7 @@ say(
 
 console.log('')
 if (ok) {
-  console.log('Web and app share one site. Push to main → GitHub Pages deploy → phones see new lessons.')
+  console.log('Web and app share one site (dsemaths.canonlessons.com). Upload dist to Hostinger → phones see new lessons.')
   process.exit(0)
 } else {
   console.log('Fix the FAIL lines so web and app stay in sync.')
