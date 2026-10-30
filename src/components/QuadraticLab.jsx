@@ -130,14 +130,14 @@ const META = {
   disc: {
     title: '根的數目 · Δ',
     lines: [
-      [{ t: '拖滑桿 · 睇拋物線掂唔掂到 x 軸' }],
+      [{ t: '撳掣 · 睇拋物線掂唔掂到 x 軸' }],
       [{ t: 'Δ 決定交幾多點', fill: GOLD, b: true }],
     ],
   },
   build: {
     title: '由已知根建方程',
     lines: [
-      [{ t: '拖兩粒根 · 方程自己寫出嚟' }],
+      [{ t: '撳掣 · 睇方程自己寫出嚟' }],
       [{ t: 'x² − (和)x + (積) = 0', fill: GOLD, b: true }],
     ],
   },
@@ -200,14 +200,13 @@ export default function QuadraticLab({ mode, stage = 99, onInteractComplete }) {
   const [factored, setFactored] = useState(false)
   const [fitted, setFitted] = useState(false)
   const [fitProg, setFitProg] = useState(0)
-  const [discT, setDiscT] = useState(0.72)
-  const [discTouched, setDiscTouched] = useState(false)
+  const [discT, setDiscT] = useState(1)
+  const [discPlayed, setDiscPlayed] = useState(false)
   const [r1, setR1] = useState(2)
   const [r2, setR2] = useState(3)
-  const [buildTouched, setBuildTouched] = useState(false)
+  const [buildPlayed, setBuildPlayed] = useState(false)
   const [iPow, setIPow] = useState(0)
   const [conjShown, setConjShown] = useState(false)
-  const dragRef = useRef(null)
   const doneRef = useRef({})
 
   // 換場景時清本地旗標（App 亦會重設 gate）
@@ -215,8 +214,11 @@ export default function QuadraticLab({ mode, stage = 99, onInteractComplete }) {
     setFactored(false)
     setFitted(false)
     setFitProg(0)
-    setDiscTouched(false)
-    setBuildTouched(false)
+    setDiscT(1)
+    setDiscPlayed(false)
+    setR1(2)
+    setR2(3)
+    setBuildPlayed(false)
     setIPow(0)
     setConjShown(false)
     doneRef.current = {}
@@ -254,49 +256,45 @@ export default function QuadraticLab({ mode, stage = 99, onInteractComplete }) {
     markDone('factor')
   }
 
-  const onDiscChange = (v) => {
-    setDiscT(v)
-    if (!discTouched) {
-      setDiscTouched(true)
-      markDone('disc')
+  /** 只撳掣：兩根 → 相切 → 飛起無交點 */
+  const runDiscDemo = () => {
+    if (discPlayed) return
+    setDiscPlayed(true)
+    const start = performance.now()
+    const dur = 1600
+    const tick = (now) => {
+      const p = clamp01((now - start) / dur)
+      // t: 1 → 0.5 → 0
+      setDiscT(1 - p)
+      if (p < 1) requestAnimationFrame(tick)
+      else markDone('disc')
     }
+    requestAnimationFrame(tick)
   }
 
-  const startRootDrag = (which, e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    dragRef.current = which
-    const move = (ev) => {
-      const svg = ev.target.ownerSVGElement || ev.target
-      const pt = svg.createSVGPoint?.()
-      // 用 client 座標粗略換算：diag 內 x 約 40–390
-      const el = document.querySelector('.fx-diag')
-      if (!el) return
-      const rect = el.getBoundingClientRect()
-      const clientX = ev.clientX ?? ev.touches?.[0]?.clientX
-      if (clientX == null) return
-      const sx = ((clientX - rect.left) / rect.width) * 430
-      const xVal = Math.max(-3.5, Math.min(3.5, (sx - OX) / SX))
-      const rounded = Math.round(xVal * 2) / 2
-      if (dragRef.current === 1) setR1(rounded)
-      else setR2(rounded)
-      if (!buildTouched) {
-        setBuildTouched(true)
+  /** 只撳掣：根由 2、3 滑去 −1、2，方程跟住改 */
+  const runBuildDemo = () => {
+    if (buildPlayed) return
+    setBuildPlayed(true)
+    const from1 = 2
+    const from2 = 3
+    const to1 = -1
+    const to2 = 2
+    const start = performance.now()
+    const dur = 1100
+    const tick = (now) => {
+      const p = clamp01((now - start) / dur)
+      const ease = p * p * (3 - 2 * p)
+      setR1(Math.round((from1 + (to1 - from1) * ease) * 10) / 10)
+      setR2(Math.round((from2 + (to2 - from2) * ease) * 10) / 10)
+      if (p < 1) requestAnimationFrame(tick)
+      else {
+        setR1(to1)
+        setR2(to2)
         markDone('build')
       }
     }
-    const up = () => {
-      dragRef.current = null
-      window.removeEventListener('pointermove', move)
-      window.removeEventListener('pointerup', up)
-      window.removeEventListener('touchmove', move)
-      window.removeEventListener('touchend', up)
-    }
-    window.addEventListener('pointermove', move)
-    window.addEventListener('pointerup', up)
-    window.addEventListener('touchmove', move, { passive: true })
-    window.addEventListener('touchend', up)
-    move(e.nativeEvent || e)
+    requestAnimationFrame(tick)
   }
 
   const sum = r1 + r2
@@ -332,13 +330,13 @@ export default function QuadraticLab({ mode, stage = 99, onInteractComplete }) {
         {scene === 'disc' && (
           <DiscScene
             u={u}
-            t={discT}
             a={discA}
             b={discB}
             c={discC}
             delta={discDelta}
             roots={discRoots}
-            onChange={onDiscChange}
+            played={discPlayed}
+            onPlay={runDiscDemo}
           />
         )}
         {scene === 'build' && (
@@ -348,7 +346,8 @@ export default function QuadraticLab({ mode, stage = 99, onInteractComplete }) {
             r2={r2}
             sum={sum}
             prod={prod}
-            onDragStart={startRootDrag}
+            played={buildPlayed}
+            onPlay={runBuildDemo}
           />
         )}
         {scene === 'coef' && <CoefScene u={u} r1={2} r2={3} />}
@@ -611,7 +610,7 @@ function FormulaScene({ u }) {
   )
 }
 
-function DiscScene({ u, t, a, b, c, delta, roots, onChange }) {
+function DiscScene({ u, a, b, c, delta, roots, played, onPlay }) {
   const path = parabolaPath(a * 0.55, b * 0.55, c * 0.55)
   const label =
     delta > 0.15 ? 'Δ > 0 · 兩個交點' : delta < -0.15 ? 'Δ < 0 · 無交點' : 'Δ = 0 · 相切（重根）'
@@ -638,39 +637,12 @@ function DiscScene({ u, t, a, b, c, delta, roots, onChange }) {
       <text x={215} y={72} textAnchor="middle" fontSize={13} fill={MUTED} fontFamily={SERIF}>
         Δ ≈ {delta.toFixed(1)}
       </text>
-      <foreignObject x={55} y={235} width={320} height={44}>
-        <div
-          xmlns="http://www.w3.org/1999/xhtml"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            height: '100%',
-            fontFamily: 'Georgia, serif',
-            color: MUTED,
-            fontSize: 12,
-          }}
-          onPointerDown={(e) => e.stopPropagation()}
-        >
-          <span style={{ whiteSpace: 'nowrap' }}>無根</span>
-          <input
-            type="range"
-            min={0}
-            max={1}
-            step={0.01}
-            value={t}
-            onChange={(e) => onChange(+e.target.value)}
-            style={{ flex: 1, accentColor: GOLD }}
-            aria-label="調整判別式 Δ"
-          />
-          <span style={{ whiteSpace: 'nowrap' }}>兩根</span>
-        </div>
-      </foreignObject>
+      <Cta x={120} y={230} w={190} h={40} label="播放 Δ 變化" onClick={onPlay} done={played} />
     </g>
   )
 }
 
-function BuildScene({ u, r1, r2, sum, prod, onDragStart }) {
+function BuildScene({ u, r1, r2, sum, prod, played, onPlay }) {
   const a = 0.45
   const b = -a * sum
   const c = a * prod
@@ -679,24 +651,16 @@ function BuildScene({ u, r1, r2, sum, prod, onDragStart }) {
     <g>
       <Axes />
       <path d={path} fill="none" stroke={BLUE} strokeWidth={2.4} opacity={clamp01(u / 0.35)} />
-      <g
-        style={{ cursor: 'grab' }}
-        onPointerDown={(e) => onDragStart(1, e)}
-        opacity={clamp01(u / 0.3)}
-      >
+      <g opacity={clamp01(u / 0.3)}>
         <circle cx={toX(r1)} cy={OY} r={10} fill={GOLD} fillOpacity={0.4} stroke={GOLD} strokeWidth={2.2} />
         <text x={toX(r1)} y={OY - 16} textAnchor="middle" fontSize={14} fill={GOLD} fontFamily={SERIF} fontWeight={700}>
-          {r1}
+          {fmtNum(r1)}
         </text>
       </g>
-      <g
-        style={{ cursor: 'grab' }}
-        onPointerDown={(e) => onDragStart(2, e)}
-        opacity={clamp01(u / 0.3)}
-      >
+      <g opacity={clamp01(u / 0.3)}>
         <circle cx={toX(r2)} cy={OY} r={10} fill={OK} fillOpacity={0.4} stroke={OK} strokeWidth={2.2} />
         <text x={toX(r2)} y={OY - 16} textAnchor="middle" fontSize={14} fill={OK} fontFamily={SERIF} fontWeight={700}>
-          {r2}
+          {fmtNum(r2)}
         </text>
       </g>
       <text
@@ -712,8 +676,9 @@ function BuildScene({ u, r1, r2, sum, prod, onDragStart }) {
         {`x² − (${fmtNum(sum)})x + (${fmtNum(prod)}) = 0`}
       </text>
       <text x={215} y={72} textAnchor="middle" fontSize={13} fill={MUTED} fontFamily={SERIF} opacity={clamp01((u - 0.3) / 0.3)}>
-        和 {fmtNum(sum)} · 積 {fmtNum(prod)} · 拖根試下
+        和 {fmtNum(sum)} · 積 {fmtNum(prod)}
       </text>
+      <Cta x={120} y={230} w={190} h={40} label="示範建方程" onClick={onPlay} done={played} />
     </g>
   )
 }

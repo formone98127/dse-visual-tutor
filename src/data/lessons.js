@@ -464,7 +464,7 @@ const u1Lesson = {
   id: 'u1-lesson',
   mode: 'DSE',
   title: 'U1 一元二次方程',
-  subtitle: '拋物線 · 配方貼合 · Δ 滑桿 · 拖根建方程',
+  subtitle: '拋物線 · 配方貼合 · Δ 變化 · 建方程',
   lab: 'u1',
   beats: [
     {
@@ -497,19 +497,19 @@ const u1Lesson = {
     },
     {
       id: 's5',
-      caption: '到你——拖滑桿改變 Δ，睇拋物線由兩個交點 → 相切 → 飛起無交點。',
+      caption: '到你——撳「播放 Δ 變化」，睇拋物線由兩個交點 → 相切 → 飛起無交點。',
       mode: 'u1.disc',
       steps: 1,
       gate: 'interact',
-      gateHint: '先拖滑桿睇交點先繼續',
+      gateHint: '先撳「播放 Δ 變化」先繼續',
     },
     {
       id: 's6',
-      caption: '到你——拖兩粒根，方程 x²−(和)x+(積)=0 會自己寫出嚟。',
+      caption: '到你——撳「示範建方程」，睇兩粒根郁、方程 x²−(和)x+(積)=0 自己寫出嚟。',
       mode: 'u1.build',
       steps: 1,
       gate: 'interact',
-      gateHint: '先拖兩粒根先繼續',
+      gateHint: '先撳「示範建方程」先繼續',
     },
     {
       id: 's7',
