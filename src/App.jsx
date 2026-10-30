@@ -317,8 +317,6 @@ export default function App() {
           unitTitle={activeUnit?.title ?? null}
           pendingTitle={activeUnit && !lesson ? activeUnit.title : null}
           onInteractComplete={onInteractComplete}
-          gateLocked={gateLocked}
-          gateHint={gateHint}
         />
         <ControlDeck
           beat={beat}
