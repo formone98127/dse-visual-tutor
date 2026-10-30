@@ -16,6 +16,7 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(true)
   const [showComplete, setShowComplete] = useState(false)
   const [continueInfo, setContinueInfo] = useState(null)
+  const [gateOk, setGateOk] = useState(true)
   const startedLessonRef = useRef(null)
   const lastPageKeyRef = useRef(null)
 
@@ -34,6 +35,20 @@ export default function App() {
     Boolean(lesson) &&
     currentStep >= total - 1 &&
     stageInBeat >= beatSteps - 1
+  const needsGate = beat?.gate === 'interact'
+  const gateLocked = Boolean(needsGate && !gateOk)
+  const gateHint = gateLocked
+    ? beat?.gateHint || '先完成畫面上嘅互動，先可以繼續'
+    : null
+
+  // 換拍時：有 interact gate → 鎖住；否則即開
+  useEffect(() => {
+    setGateOk(beat?.gate !== 'interact')
+  }, [lesson?.id, currentStep, beat?.id, beat?.gate])
+
+  const onInteractComplete = useCallback(() => {
+    setGateOk(true)
+  }, [])
 
   const nextUnit = useMemo(
     () => (lesson ? suggestNextUnit(mode, lesson.id, lessons) : null),
@@ -151,6 +166,7 @@ export default function App() {
   const goNext = useCallback(() => {
     if (!lesson || showComplete) return
     const b = lesson.beats[currentStep]
+    if (b?.gate === 'interact' && !gateOk) return
     const st = b?.steps ?? 1
     if (stageInBeat < st - 1) {
       setStageInBeat((s) => s + 1)
@@ -163,7 +179,7 @@ export default function App() {
     }
     // 最後一頁揭晒 → 完成本課
     setShowComplete(true)
-  }, [lesson, currentStep, stageInBeat, showComplete])
+  }, [lesson, currentStep, stageInBeat, showComplete, gateOk])
 
   const goPrev = useCallback(() => {
     if (!lesson) return
@@ -300,6 +316,9 @@ export default function App() {
           total={total}
           unitTitle={activeUnit?.title ?? null}
           pendingTitle={activeUnit && !lesson ? activeUnit.title : null}
+          onInteractComplete={onInteractComplete}
+          gateLocked={gateLocked}
+          gateHint={gateHint}
         />
         <ControlDeck
           beat={beat}
@@ -310,6 +329,8 @@ export default function App() {
           nextLesson={nextUnit}
           onTakeNext={takeNextLesson}
           onBackHome={backHome}
+          gateLocked={gateLocked}
+          gateHint={gateHint}
         />
       </main>
     </div>

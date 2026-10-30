@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import PyramidLab from './PyramidLab.jsx'
 import PythagorasLab from './PythagorasLab.jsx'
+import QuadraticLab from './QuadraticLab.jsx'
 import BasicLab from './BasicLab.jsx'
 import DirectedLab from './DirectedLab.jsx'
 import ApproxLab from './ApproxLab.jsx'
@@ -10,6 +11,9 @@ import RatioLab from './RatioLab.jsx'
 import AlgebraLab from './AlgebraLab.jsx'
 import TopicLab from './TopicLab.jsx'
 import { STAGE_W, STAGE_H } from './LabStage.jsx'
+
+/** 旗艦 lab：跨拍保持同一實例，先至圖形可以連續變形 */
+const FLAGSHIP_LABS = new Set(['pythagoras', 'u1', 'pyramid'])
 
 const LABS = {
   pyramid: PyramidLab,
@@ -47,8 +51,8 @@ const LABS = {
   k30: TopicLab,
   k31: TopicLab,
   k32: TopicLab,
-  // DSE 必修 + 延伸模組同樣共用 TopicLab
-  u1: TopicLab,
+  // U1 旗艦互動實驗室；其餘 DSE 章仍用 TopicLab
+  u1: QuadraticLab,
   u2: TopicLab,
   u3: TopicLab,
   u4: TopicLab,
@@ -121,10 +125,25 @@ function pad(n) {
   return String(n).padStart(2, '0')
 }
 
-export default function Theater({ mode, lesson, beat, pendingTitle, unitTitle, stage, index = 0, total = 0, steps = 1 }) {
+export default function Theater({
+  mode,
+  lesson,
+  beat,
+  pendingTitle,
+  unitTitle,
+  stage,
+  index = 0,
+  total = 0,
+  steps = 1,
+  onInteractComplete,
+  gateLocked = false,
+  gateHint = null,
+}) {
   const { snap, visible } = useStageSnapshot({ beat, lesson, pendingTitle, mode })
   const Lab = snap.lesson ? LABS[snap.lesson.lab] : null
   const playing = snap.lesson && snap.beat && Lab
+  const remountKey =
+    snap.lesson && FLAGSHIP_LABS.has(snap.lesson.lab) ? snap.lesson.id : snap.beat?.id
 
   // 自動貼合：量度舞台實際空間，計出場景（STAGE_W × STAGE_H）最大唔變形嘅尺寸
   // 手機/平板/桌面/投影機全部自動，唔使用戶調較
@@ -242,15 +261,21 @@ export default function Theater({ mode, lesson, beat, pendingTitle, unitTitle, s
       >
         {playing ? (
           /* 自動貼合尺寸：wrapper 尺寸由 ResizeObserver 計算，svg 填滿唔變形 */
-          <div key={snap.beat.id} className="stage-in flex h-full w-full items-center justify-center overflow-hidden p-2 md:p-5">
+          <div key={remountKey} className="stage-in flex h-full w-full items-center justify-center overflow-hidden p-2 md:p-5">
             <div className="shrink-0 overflow-hidden" style={{ width: fit.w, height: fit.h }}>
-              <Lab mode={snap.beat.mode} stage={stage} />
+              <Lab mode={snap.beat.mode} stage={stage} onInteractComplete={onInteractComplete} />
             </div>
           </div>
         ) : (
           <Placeholder pendingTitle={snap.pendingTitle} mode={snap.mode} />
         )}
       </div>
+
+      {gateLocked && gateHint && (
+        <div className="pointer-events-none absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-[120%] rounded-full border border-amber-400/40 bg-black/75 px-4 py-1.5 text-[11px] font-bold tracking-wide text-amber-300 backdrop-blur">
+          {gateHint}
+        </div>
+      )}
 
       {/* 右下角資訊列：滑動提示(手機) / 快速鍵(桌面) + 頁內圓點 + 頁數
           —— 放入舞台範圍，唔跟內容淡化；右下角觀景窗標記讓位俾佢 */}

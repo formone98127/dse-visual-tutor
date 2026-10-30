@@ -40,6 +40,8 @@ export default function ControlDeck({
   onTakeNext = null,
   onBackHome = null,
   showComplete = false,
+  gateLocked = false,
+  gateHint = null,
 }) {
   const parsed = beat ? splitBeatTag(beat.caption) : null
   const tapStart = useRef(null)
@@ -49,7 +51,7 @@ export default function ControlDeck({
   }
 
   const onPointerUp = (e) => {
-    if (!onNext || tapStart.current == null || showComplete) return
+    if (!onNext || tapStart.current == null || showComplete || gateLocked) return
     const dx = e.clientX - tapStart.current.x
     const dy = e.clientY - tapStart.current.y
     tapStart.current = null
@@ -67,7 +69,7 @@ export default function ControlDeck({
       tabIndex={showComplete ? undefined : 0}
       aria-label={showComplete ? undefined : '點一下進入下一步'}
       onKeyDown={
-        showComplete
+        showComplete || gateLocked
           ? undefined
           : (e) => {
               if (!onNext) return
@@ -167,7 +169,13 @@ export default function ControlDeck({
           ) : (
             <p className="text-sm font-bold text-white md:text-base">這裡會顯示老師的講解文字</p>
           )}
-          <p className="hint-bob mt-1.5 shrink-0 text-[10px] tracking-[0.2em] text-zinc-600 md:hidden">點呢度繼續 →</p>
+          {gateLocked ? (
+            <p className="hint-bob mt-1.5 shrink-0 text-[10px] font-bold tracking-[0.15em] text-amber-400/90">
+              {gateHint || '先完成畫面上嘅互動'}
+            </p>
+          ) : (
+            <p className="hint-bob mt-1.5 shrink-0 text-[10px] tracking-[0.2em] text-zinc-600 md:hidden">點呢度繼續 →</p>
+          )}
         </div>
       )}
     </section>

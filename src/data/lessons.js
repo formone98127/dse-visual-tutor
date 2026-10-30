@@ -459,23 +459,105 @@ const topicLessons = TOPIC_CHAPTERS.map(([key, title, subtitle, beats]) => ({
   })),
 }))
 
-/** DSE 必修 U1–U20 + M1/M2 —— 同樣共用 TopicLab 場景引擎（mode「章.場景」）。 */
+/** U1 旗艦互動課（QuadraticLab）——字幕講「睇圖／做一步」，挑戰拍要閘住 Next。 */
+const u1Lesson = {
+  id: 'u1-lesson',
+  mode: 'DSE',
+  title: 'U1 一元二次方程',
+  subtitle: '拋物線 · 配方貼合 · Δ 滑桿 · 拖根建方程',
+  lab: 'u1',
+  beats: [
+    {
+      id: 's1',
+      caption: '睇！最高次係 2 嘅方程，圖像就係一條拋物線——a、b、c 各有角色。',
+      mode: 'u1.concept',
+      steps: 1,
+    },
+    {
+      id: 's2',
+      caption: '到你——撳「拆因式」，睇住括號打開、兩粒根喺 x 軸亮起。',
+      mode: 'u1.factor',
+      steps: 1,
+      gate: 'interact',
+      gateHint: '先撳「拆因式」先繼續',
+    },
+    {
+      id: 's3',
+      caption: '到你——撳「自動貼合」，睇缺角點樣補成完全平方。',
+      mode: 'u1.complete',
+      steps: 1,
+      gate: 'interact',
+      gateHint: '先撳「自動貼合」先繼續',
+    },
+    {
+      id: 's4',
+      caption: '求根公式計出嚟嘅數，就係拋物線掂到 x 軸嗰兩點——公式同圖係同一件事。',
+      mode: 'u1.formula',
+      steps: 1,
+    },
+    {
+      id: 's5',
+      caption: '到你——拖滑桿改變 Δ，睇拋物線由兩個交點 → 相切 → 飛起無交點。',
+      mode: 'u1.disc',
+      steps: 1,
+      gate: 'interact',
+      gateHint: '先拖滑桿睇交點先繼續',
+    },
+    {
+      id: 's6',
+      caption: '到你——拖兩粒根，方程 x²−(和)x+(積)=0 會自己寫出嚟。',
+      mode: 'u1.build',
+      steps: 1,
+      gate: 'interact',
+      gateHint: '先拖兩粒根先繼續',
+    },
+    {
+      id: 's7',
+      caption: '根與係數：α+β=−b/a、αβ=c/a——唔使解出根都可以讀。',
+      mode: 'u1.coef',
+      steps: 1,
+    },
+    {
+      id: 's8',
+      caption: 'α²+β² 就係大正方形減兩塊 αβ——(α+β)²−2αβ。',
+      mode: 'u1.squares',
+      steps: 1,
+    },
+    {
+      id: 's9',
+      caption: '複數平面：每次乘 i，點就逆時針轉 90°——所以 i²=−1。',
+      mode: 'u1.complex',
+      steps: 1,
+    },
+    {
+      id: 's10',
+      caption: '有 2+3i 就一定有共軛 2−3i——撳掣睇佢哋點組成實係數方程。',
+      mode: 'u1.complex_build',
+      steps: 1,
+    },
+    {
+      id: 's11',
+      caption: '常犯錯對照：分母要 2a、和有負號、複數根要成對。',
+      mode: 'u1.mistakes',
+      steps: 1,
+    },
+    {
+      id: 's12',
+      caption: '應用：闊 x、長 x+3、面積 40——圖長出方程，捨負根得闊 5、長 8。',
+      mode: 'u1.apply',
+      steps: 1,
+    },
+    {
+      id: 's13',
+      caption: 'U1 工具箱齊：公式 · Δ · 共軛——下一章：U2 函數及其圖像。',
+      mode: 'u1.summary',
+      steps: 1,
+    },
+  ],
+}
+
+/** DSE 必修 U2–U20 + M1/M2 —— 共用 TopicLab 場景引擎（mode「章.場景」）。U1 見上方旗艦課。 */
 const DSE_CHAPTERS = [
-  ['u1', 'U1 一元二次方程', '總結 P8–9 · 公式 · Δ · 根係數 · 複數', [
-    ['U1（數學總結 P8）：一元二次方程 ax²+bx+c=0（a≠0）。', 'concept'],
-    ['因式法：x²−5x+6=0 → (x−2)(x−3)=0 → x=2 或 3。', 'factor'],
-    ['配方法：x²−6x+5=0 → (x−3)²=4 → x=5 或 1。', 'complete'],
-    ['求根公式（P8）：x=[−b±√(b²−4ac)]/(2a)。例 2x²−3x−2=0 → x=2 或 −1/2。', 'formula'],
-    ['根的數目（P8）：Δ=b²−4ac → Δ>0 兩不同實根；=0 重根；<0 無實數根。', 'disc'],
-    ['由已知根建方程（P8）：x²−(和)x+(積)=0。根 2、3 → x²−5x+6=0。', 'build'],
-    ['根與係數（P8 非基礎）：α+β=−b/a，αβ=c/a。', 'coef'],
-    ['恆等式：α²+β²=(α+β)²−2αβ。例和 5 積 6 → 13。', 'squares'],
-    ['複數運算（P8）：i²=−1；例 (3+i)/(2−i)=1+i（書上例）。', 'complex'],
-    ['複數根建方程（P9）：一根 2+3i → 共軛 2−3i → x²−4x+13=0。', 'complex_build'],
-    ['常見錯：分母要 2a、和係 −b/a、複數根要連共軛。', 'mistakes'],
-    ['應用：長比闊多 3、面積 40 → 闊 5 cm、長 8 cm。', 'apply'],
-    ['U1 跟教材 P8–9 齊——下一章：U2 函數及其圖像。', 'summary'],
-  ]],
   ['u2', 'U2 函數及其圖像', '記法 · 標準形 · 四招 · 配方 · 極值', [
     ['U2 函數（數學總結 P11–12）：每個准許嘅 x 只對應一個 y，寫 y=f(x)。', 'concept'],
     ['記法：f(x)=2x+1 → f(3)=7；定義域——分母≠0、偶次根≥0。', 'notation'],
@@ -731,5 +813,5 @@ const q18 = {
 
 export const LESSONS_BY_MODE = {
   PRE_DSE: [k1Basic, k2Directed, k3Approx, k4Rational, k5Percent, k6Ratio, k7Algebra, ...topicLessons, pythagoras],
-  DSE: [q18, ...dseTopicLessons],
+  DSE: [q18, u1Lesson, ...dseTopicLessons],
 }
