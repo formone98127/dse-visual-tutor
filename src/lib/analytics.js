@@ -1,10 +1,20 @@
 /**
- * 輕量分析：事件寫入本機 + console。
- * 之後可改成送去 Plausible / GA，唔使改呼叫端。
+ * 輕量分析：事件寫入本機 + console，再轉發 GA4（如果 /ga4.js 已啟用）。
+ * 呼叫端照舊 track(name, props)，唔使理送去邊。
  */
 
 const KEY = 'dvt.analytics.v1'
 const MAX_EVENTS = 400
+
+/** GA4 啟用中（/ga4.js 插入咗真 ID）先會送出 */
+function forwardToGa(name, props) {
+  if (typeof window === 'undefined' || typeof window.gtag !== 'function') return
+  try {
+    window.gtag('event', name, props)
+  } catch {
+    /* ignore */
+  }
+}
 
 function readStore() {
   try {
@@ -46,6 +56,7 @@ export function track(name, props = {}) {
   if (typeof console !== 'undefined' && console.debug) {
     console.debug('[dvt]', name, props)
   }
+  forwardToGa(name, props)
   if (typeof window !== 'undefined') {
     window.__DVT_ANALYTICS = store
   }
