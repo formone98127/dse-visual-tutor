@@ -20,6 +20,10 @@ tmp_summary_u1.txt
 
 # 影片製作工作區（HyperFrames；含大型音訊／視訊素材與 node_modules）
 product-intro/
+shorts/
+
+# 宣傳片成品（大媒體檔，唔入 git）
+marketing-videos/
 
 # 本地助手設定
 mobile/.claude/
