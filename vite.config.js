@@ -6,7 +6,8 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { CONTENT_VERSION, CONTENT_STAMP } from './src/data/contentVersion.js'
 
-// 多頁入口：index.html = 學生版；builder.html = 後台劇本制作器
+// 多頁入口：index.html = marketing landing；learn.html = 學生版
+// builder.html（內部後台）只供本地開發，不打包進 dist
 const here = (p) => resolve(dirname(fileURLToPath(import.meta.url)), p)
 
 /** Write public/content-version.json so the phone app can bust WebView cache. */
@@ -49,7 +50,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: here('index.html'),
-        builder: here('builder.html'),
+        learn: here('learn.html'),
       },
     },
   },

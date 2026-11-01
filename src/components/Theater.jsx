@@ -167,41 +167,6 @@ export default function Theater({
       // 用同一個 s 計寬高，避免分開 round 令比例歪 1px
       const next = { w: Math.round(STAGE_W * s), h: Math.round(STAGE_H * s) }
       setFit(next)
-      // #region agent log
-      requestAnimationFrame(() => {
-        const lab = el.querySelector('.idx-lab')
-        const info = el.querySelector('.absolute.bottom-4, .absolute.bottom-6')
-        const topLbl = el.querySelector('span.absolute.left-16, span.absolute.md\\:left-8')
-        let chromeOverlap = null
-        if (lab && info) {
-          const L = lab.getBoundingClientRect()
-          const I = info.getBoundingClientRect()
-          const ox = Math.max(0, Math.min(L.right, I.right) - Math.max(L.left, I.left))
-          const oy = Math.max(0, Math.min(L.bottom, I.bottom) - Math.max(L.top, I.top))
-          if (ox * oy > 20) chromeOverlap = { with: 'infoBar', area: Math.round(ox * oy), labBottom: Math.round(L.bottom), infoTop: Math.round(I.top) }
-        }
-        if (lab && topLbl && !chromeOverlap) {
-          const L = lab.getBoundingClientRect()
-          const T = topLbl.getBoundingClientRect()
-          const ox = Math.max(0, Math.min(L.right, T.right) - Math.max(L.left, T.left))
-          const oy = Math.max(0, Math.min(L.bottom, T.bottom) - Math.max(L.top, T.top))
-          if (ox * oy > 20) chromeOverlap = { with: 'topLabel', area: Math.round(ox * oy) }
-        }
-        fetch('http://127.0.0.1:7691/ingest/cc9e9dff-d30f-40e1-a86b-8f44c754203f', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': 'fb17f7' },
-          body: JSON.stringify({
-            sessionId: 'fb17f7',
-            runId: 'post-fix',
-            hypothesisId: 'D',
-            location: 'Theater.jsx:recompute',
-            message: 'Theater fit vs chrome overlap',
-            data: { fit: next, stageH: Math.round(r.height), stageW: Math.round(r.width), chromeTop, chromeBottom, chromeOverlap },
-            timestamp: Date.now(),
-          }),
-        }).catch(() => {})
-      })
-      // #endregion
     }
     recompute()
     const ro = new ResizeObserver(recompute)
