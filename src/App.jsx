@@ -17,8 +17,10 @@ export default function App() {
   const [showComplete, setShowComplete] = useState(false)
   const [continueInfo, setContinueInfo] = useState(null)
   const [gateOk, setGateOk] = useState(true)
+  const [focusTopicId, setFocusTopicId] = useState(null)
   const startedLessonRef = useRef(null)
   const lastPageKeyRef = useRef(null)
+  const bootQueryRef = useRef(false)
 
   const lessons = LESSONS_BY_MODE[mode]
   const syllabus = SYLLABUS[mode]
@@ -57,6 +59,21 @@ export default function App() {
 
   const progressPct =
     !lesson || total === 0 ? 0 : total === 1 ? 100 : (currentStep / (total - 1)) * 100
+
+  // Deep-link from landing: ?mode=PRE_DSE|DSE&topic=k25 (does not clear continue card)
+  useEffect(() => {
+    if (bootQueryRef.current) return
+    bootQueryRef.current = true
+    try {
+      const params = new URLSearchParams(window.location.search)
+      const m = params.get('mode')
+      if (m === 'PRE_DSE' || m === 'DSE') setMode(m)
+      const topic = (params.get('topic') || '').trim().toLowerCase()
+      if (topic) setFocusTopicId(topic)
+    } catch {
+      /* ignore malformed search */
+    }
+  }, [])
 
   // 開首讀取本機進度 → 「繼續上課」卡
   useEffect(() => {
@@ -280,6 +297,7 @@ export default function App() {
         continueTarget={pickingUnit ? continueInfo : null}
         onContinue={pickingUnit ? resumeContinue : null}
         onCloseMenu={() => setMenuOpen(false)}
+        preferredTopicId={focusTopicId}
       />
 
       <main

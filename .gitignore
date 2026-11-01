@@ -11,3 +11,15 @@ audit_sheets/
 mob_*.png
 mobfix_*.png
 audit2/
+
+# 臨時工作檔（OCR 文本、除錯日誌、救援備份）
+tmp_ocr/
+tmp_summary_u1.txt
+*.recovered
+.cursor/
+
+# 影片製作工作區（HyperFrames；含大型音訊／視訊素材與 node_modules）
+product-intro/
+
+# 本地助手設定
+mobile/.claude/

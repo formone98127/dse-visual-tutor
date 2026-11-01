@@ -3,20 +3,874 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Phone WebView must not keep a stale lesson pack -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-    <title>DSE Visual Tutor · DSE網上課程</title>
+    <!-- deploy: 2026-11-01-launch-ready -->
+    <title>真正完全免費 DSE 數學視覺講解｜by topic／past paper 唔明圖就睇通｜唔使補習</title>
+    <meta
+      name="description"
+      content="真正完全免費：DSE 數學廣東話一步一圖視覺 lab——唔使報班、唔使信用卡。past paper／by topic 操完睇唔通圖？嚟呢度睇通。打破「要補習先學到」嘅困局 · 對齊 EDB。"
+    />
+    <meta
+      name="keywords"
+      content="真正完全免費, DSE 數學, past paper, by topic, 唔使補習, 視覺講解, 廣東話, 評卷參考, 畢氏定理, 軌跡, 圓, 三角比, M1, M2"
+    />
+    <link rel="canonical" href="https://dsemaths.canonlessons.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="zh_HK" />
+    <meta property="og:url" content="https://dsemaths.canonlessons.com/" />
+    <meta property="og:title" content="真正完全免費 DSE 數學視覺講解｜唔使補習先睇通｜by topic／past paper" />
+    <meta
+      property="og:description"
+      content="真正完全免費 · 唔使報班 · 唔使信用卡。past paper／by topic 睇唔通圖？廣東話一步一圖幫你睇通——資源應人人可得。"
+    />
+    <meta property="og:image" content="https://dsemaths.canonlessons.com/og-cover.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="真正完全免費｜DSE 數學 by topic 視覺講解｜唔使補習" />
+    <meta
+      name="twitter:description"
+      content="真正完全免費 · 廣東話一步一圖 · by topic。打破要補習先學到嘅困局——唔係下載站，係睇通圖嘅地方。"
+    />
+    <meta name="twitter:image" content="https://dsemaths.canonlessons.com/og-cover.jpg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!-- GA4 接線（placeholder 狀態唔會載入任何嘢；換 ID 只改 /ga4.js 一個字串） -->
+    <script src="/ga4.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap"
       rel="stylesheet"
     />
+    <style>
+      :root {
+        --gold: #ffd166;
+        --blue: #4cc9f0;
+        --ok: #b8f27c;
+        --red: #ff6b7a;
+        --ink: #f2f5ff;
+        --muted: rgba(242, 245, 255, 0.58);
+        --line: rgba(242, 245, 255, 0.12);
+        --ground: #0a0a0c;
+        --panel: #121218;
+        --panel2: #17171f;
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        font-family: "Noto Sans TC", system-ui, sans-serif;
+        background: var(--ground);
+        color: var(--ink);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+      a { color: inherit; text-decoration: none; }
+      .wrap {
+        width: min(1120px, calc(100% - 2rem));
+        margin-inline: auto;
+      }
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        backdrop-filter: blur(14px);
+        background: rgba(10, 10, 12, 0.82);
+        border-bottom: 1px solid var(--line);
+      }
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.9rem 0;
+      }
+      .wordmark {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+      }
+      .wordmark strong {
+        font-size: 1.05rem;
+        letter-spacing: 0.02em;
+      }
+      .wordmark span {
+        font-size: 0.72rem;
+        color: var(--gold);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+      .nav-links {
+        display: none;
+        align-items: center;
+        gap: 1rem;
+        font-size: 0.88rem;
+        color: var(--muted);
+      }
+      .nav-links a:hover { color: var(--blue); }
+      @media (min-width: 880px) {
+        .nav-links { display: flex; }
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45rem;
+        border-radius: 999px;
+        padding: 0.85rem 1.35rem;
+        font-weight: 800;
+        font-size: 0.95rem;
+        border: 1px solid transparent;
+        transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+      }
+      .btn:hover { transform: translateY(-1px); }
+      .btn-primary {
+        background: linear-gradient(135deg, #ffe08a, var(--gold) 45%, #f0b429);
+        color: #1a1408;
+        box-shadow: 0 10px 30px rgba(255, 209, 102, 0.18);
+      }
+      .btn-ghost {
+        border-color: rgba(242, 245, 255, 0.18);
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--ink);
+      }
+      .btn-ghost:hover { border-color: rgba(76, 201, 240, 0.45); }
+      .btn-sm { padding: 0.65rem 1.1rem; font-size: 0.88rem; }
+      .hero {
+        position: relative;
+        padding: 3.5rem 0 2.5rem;
+        overflow: hidden;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: -20% auto auto 40%;
+        width: 520px;
+        height: 520px;
+        background: radial-gradient(circle, rgba(76, 201, 240, 0.16), transparent 65%);
+        pointer-events: none;
+      }
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: 10% auto auto -10%;
+        width: 420px;
+        height: 420px;
+        background: radial-gradient(circle, rgba(255, 209, 102, 0.12), transparent 70%);
+        pointer-events: none;
+      }
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: 1px solid rgba(255, 209, 102, 0.28);
+        background: rgba(255, 209, 102, 0.08);
+        color: var(--gold);
+        border-radius: 999px;
+        padding: 0.35rem 0.85rem;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+      }
+      .hero h1 {
+        margin: 1.1rem 0 0.85rem;
+        max-width: 22ch;
+        font-family: "Noto Serif TC", Georgia, serif;
+        font-weight: 900;
+        font-size: clamp(2.05rem, 5.6vw, 3.35rem);
+        line-height: 1.18;
+        letter-spacing: -0.02em;
+      }
+      .hero h1 em {
+        font-style: normal;
+        color: var(--blue);
+      }
+      .hero-lead {
+        max-width: 40rem;
+        color: var(--muted);
+        font-size: 1.05rem;
+      }
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1.75rem;
+      }
+      .proof {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+        margin: 2.25rem 0 0.5rem;
+        padding: 1rem;
+        border: 1px solid var(--line);
+        border-radius: 1.25rem;
+        background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+      }
+      .proof div {
+        text-align: center;
+        padding: 0.55rem 0.35rem;
+      }
+      .proof strong {
+        display: block;
+        font-size: clamp(1.05rem, 2.8vw, 1.35rem);
+        color: var(--gold);
+        font-weight: 900;
+      }
+      .proof span {
+        display: block;
+        margin-top: 0.25rem;
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+      section { padding: 3rem 0; }
+      .section-head {
+        display: flex;
+        flex-direction: column;
+        gap: 0.55rem;
+        margin-bottom: 1.5rem;
+      }
+      .section-head h2 {
+        margin: 0;
+        font-family: "Noto Serif TC", Georgia, serif;
+        font-size: clamp(1.55rem, 3.5vw, 2.1rem);
+        font-weight: 900;
+      }
+      .section-head p {
+        margin: 0;
+        color: var(--muted);
+        max-width: 42rem;
+      }
+      .packs {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      @media (min-width: 720px) {
+        .packs { grid-template-columns: repeat(2, 1fr); }
+        .packs .pack-wide { grid-column: 1 / -1; }
+      }
+      .pack {
+        position: relative;
+        border: 1px solid var(--line);
+        border-radius: 1.35rem;
+        background: var(--panel);
+        padding: 1.35rem 1.3rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+        min-height: 100%;
+      }
+      .pack:hover { border-color: rgba(76, 201, 240, 0.35); }
+      .pack.featured-pack {
+        border-color: rgba(184, 242, 124, 0.32);
+        background:
+          radial-gradient(circle at 95% 0%, rgba(184, 242, 124, 0.1), transparent 42%),
+          var(--panel);
+      }
+      .pack-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.75rem;
+      }
+      .pack h3 {
+        margin: 0;
+        font-size: 1.28rem;
+        font-weight: 900;
+      }
+      .pack .strand {
+        margin-top: 0.25rem;
+        color: var(--blue);
+        font-size: 0.82rem;
+        font-weight: 700;
+      }
+      .badge {
+        flex-shrink: 0;
+        border-radius: 999px;
+        padding: 0.28rem 0.7rem;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        background: rgba(184, 242, 124, 0.12);
+        color: var(--ok);
+        border: 1px solid rgba(184, 242, 124, 0.28);
+      }
+      .badge.warn {
+        background: rgba(255, 209, 102, 0.1);
+        color: var(--gold);
+        border-color: rgba(255, 209, 102, 0.28);
+      }
+      .pack .subtitle { margin: 0; color: var(--muted); font-size: 0.95rem; }
+      .topic-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+      }
+      .topic-chips span {
+        border-radius: 999px;
+        padding: 0.22rem 0.65rem;
+        font-size: 0.78rem;
+        font-weight: 700;
+        background: rgba(76, 201, 240, 0.1);
+        border: 1px solid rgba(76, 201, 240, 0.22);
+        color: rgba(242, 245, 255, 0.9);
+      }
+      .codes {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+      }
+      .codes span {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.72rem;
+        border: 1px solid var(--line);
+        border-radius: 0.45rem;
+        padding: 0.18rem 0.42rem;
+        color: rgba(242, 245, 255, 0.75);
+      }
+      .pack .highlight { margin: 0; color: rgba(242, 245, 255, 0.86); font-size: 0.92rem; }
+      .pack .hint {
+        margin: 0;
+        color: var(--gold);
+        font-size: 0.82rem;
+        font-weight: 700;
+      }
+      .pack .cta-row { margin-top: auto; padding-top: 0.35rem; }
+      .steps {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.9rem;
+      }
+      @media (min-width: 800px) {
+        .steps { grid-template-columns: repeat(3, 1fr); }
+      }
+      .step {
+        border: 1px solid var(--line);
+        border-radius: 1.25rem;
+        background: var(--panel2);
+        padding: 1.25rem 1.2rem;
+      }
+      .step-num {
+        display: inline-flex;
+        width: 2rem;
+        height: 2rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: rgba(76, 201, 240, 0.12);
+        color: var(--blue);
+        font-weight: 900;
+        font-size: 0.9rem;
+        margin-bottom: 0.8rem;
+      }
+      .step h3 { margin: 0 0 0.4rem; font-size: 1.05rem; }
+      .step p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+      .panel-block {
+        border: 1px solid var(--line);
+        border-radius: 1.35rem;
+        background: var(--panel);
+        padding: 1.4rem 1.3rem;
+      }
+      .panel-block p { margin: 0; color: var(--muted); }
+      .panel-block p + p { margin-top: 0.75rem; }
+      .panel-block a.inline,
+      .step a.inline {
+        color: var(--blue);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .featured {
+        border: 1px solid rgba(184, 242, 124, 0.28);
+        border-radius: 1.5rem;
+        background:
+          radial-gradient(circle at 90% 10%, rgba(184, 242, 124, 0.12), transparent 40%),
+          linear-gradient(160deg, #14141c, #101016 60%, #0d0d12);
+        padding: 1.6rem 1.4rem;
+        display: grid;
+        gap: 1.1rem;
+      }
+      @media (min-width: 860px) {
+        .featured {
+          grid-template-columns: 1.4fr 1fr;
+          align-items: center;
+          padding: 2rem 2rem;
+        }
+      }
+      .featured h2 {
+        margin: 0 0 0.55rem;
+        font-family: "Noto Serif TC", Georgia, serif;
+        font-size: clamp(1.45rem, 3vw, 1.9rem);
+        font-weight: 900;
+      }
+      .featured p { margin: 0; color: var(--muted); }
+      .featured .tag {
+        display: inline-block;
+        margin-bottom: 0.7rem;
+        color: var(--ok);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+      }
+      .feat-card {
+        border: 1px solid var(--line);
+        border-radius: 1.1rem;
+        background: rgba(0,0,0,0.28);
+        padding: 1.1rem 1rem;
+      }
+      .feat-card strong {
+        display: block;
+        font-size: 1.05rem;
+        margin-bottom: 0.35rem;
+      }
+      .feat-card span { color: var(--muted); font-size: 0.88rem; }
+      .two-col {
+        display: grid;
+        gap: 1rem;
+      }
+      @media (min-width: 800px) {
+        .two-col { grid-template-columns: 1fr 1fr; }
+      }
+      .site-footer {
+        border-top: 1px solid var(--line);
+        padding: 2rem 0 2.5rem;
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+      .footer-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.85rem 1.25rem;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .footer-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.85rem 1.1rem;
+      }
+      .footer-links a:hover { color: var(--blue); }
+
+      .free-strip {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.55rem 1rem;
+        margin: 1.25rem 0 0;
+        padding: 0.75rem 1rem;
+        border-radius: 1rem;
+        border: 1px solid rgba(184, 242, 124, 0.35);
+        background: linear-gradient(90deg, rgba(184, 242, 124, 0.12), rgba(76, 201, 240, 0.08));
+        color: var(--ok);
+        font-weight: 800;
+        font-size: 0.92rem;
+        letter-spacing: 0.02em;
+        text-align: center;
+      }
+      .free-strip .dot { opacity: 0.45; font-weight: 400; }
+      .free-pledge {
+        font-size: 0.72rem;
+        color: var(--ok);
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+      .mono-cards {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.9rem;
+      }
+      @media (min-width: 800px) {
+        .mono-cards { grid-template-columns: repeat(3, 1fr); }
+      }
+      .mono-card {
+        border: 1px solid var(--line);
+        border-radius: 1.25rem;
+        background: var(--panel2);
+        padding: 1.25rem 1.15rem;
+      }
+      .mono-card .label {
+        display: inline-block;
+        margin-bottom: 0.55rem;
+        color: var(--gold);
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+      }
+      .mono-card h3 { margin: 0 0 0.4rem; font-size: 1.05rem; }
+      .mono-card p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+      .mono-resolve {
+        margin-top: 1.25rem;
+        border: 1px solid rgba(184, 242, 124, 0.28);
+        border-radius: 1.25rem;
+        background: rgba(184, 242, 124, 0.06);
+        padding: 1.2rem 1.25rem;
+      }
+      .mono-resolve strong { color: var(--ok); }
+      .nav-free {
+        display: none;
+        font-size: 0.75rem;
+        color: var(--ok);
+        font-weight: 800;
+        white-space: nowrap;
+      }
+      @media (min-width: 880px) {
+        .nav-free { display: inline; }
+      }
+
+      @media (max-width: 640px) {
+        .proof { grid-template-columns: 1fr; }
+        .hero { padding-top: 2.4rem; }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <header class="nav">
+      <div class="wrap nav-inner">
+        <a class="wordmark" href="./" aria-label="DSE Visual Tutor 首頁">
+          <span>Canon Lessons</span>
+          <strong>DSE Visual Tutor</strong>
+        </a>
+        <nav class="nav-links" aria-label="主要導航">
+          <a href="#free-open">真正完全免費</a>
+          <a href="#by-topic">By topic</a>
+          <a href="#geometry">圖形</a>
+          <a href="#after-pp">點樣配 past paper</a>
+          <a href="learn.html">免費開始學</a>
+        </nav>
+        <span class="nav-free" aria-hidden="true">真正完全免費</span>
+        <a class="btn btn-primary btn-sm" href="learn.html">免費開始學</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" id="start">
+        <div class="wrap">
+          <div class="eyebrow">真正完全免費 · 廣東話 · 唔使報班</div>
+          <h1>真正完全免費。<br />Past paper 操完<em>睇唔通圖</em>？嚟呢度睇通——<em>唔使補習先學到</em>。</h1>
+          <p class="hero-lead">
+            好多同學同家長覺得「想睇通圖／步驟」就要報昂貴補習。我哋唔咁樣：網站視覺 lab <strong>真正完全免費</strong>——唔使報班、唔使信用卡，用廣東話<strong>一步一圖</strong>幫你睇通。學生多數先搵 past paper、by topic、評卷參考；我哋唔做另一個下載站，而係做完卷仲唔明圖時嘅下一站。
+          </p>
+          <div class="free-strip" role="status">
+            <span>真正完全免費</span>
+            <span class="dot">·</span>
+            <span>唔使報班</span>
+            <span class="dot">·</span>
+            <span>唔使信用卡</span>
+          </div>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="learn.html?mode=PRE_DSE&amp;topic=k25">免費開始學 · 圖形神技</a>
+            <a class="btn btn-ghost" href="#by-topic">按課題溫習（By topic）</a>
+          </div>
+          <div class="proof" aria-label="產品重點">
+            <div>
+              <strong>真正完全免費</strong>
+              <span>打開即學 · 無付費牆</span>
+            </div>
+            <div>
+              <strong>By topic</strong>
+              <span>數感 · 代數 · 圖形 · 數據 · 高中</span>
+            </div>
+            <div>
+              <strong>一步一圖</strong>
+              <span>睇通圖／證明／失分步驟</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <section id="free-open">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>點解要打破「要補習先學到」嘅困局</h2>
+            <p>
+              學習資源應人人可得。我哋唔抹黑任何補習品牌，亦唔取代學校同操卷——只係想：<strong style="color:var(--ink)">唔使為咗「睇通圖」先俾天價</strong>。視覺 lab 真正完全免費，人人用得。
+            </p>
+          </div>
+          <div class="mono-cards">
+            <article class="mono-card">
+              <span class="label">現實 1</span>
+              <h3>貴</h3>
+              <p>系統補習往往綁成個學期，想搞通一兩個圖形課題，都可能要先付出一大筆。</p>
+            </article>
+            <article class="mono-card">
+              <span class="label">現實 2</span>
+              <h3>時間綁死</h3>
+              <p>堂期固定，past paper 做到半夜先發現睇唔通圖——未必等得到下一堂先有人拆解。</p>
+            </article>
+            <article class="mono-card">
+              <span class="label">現實 3</span>
+              <h3>圖形步驟仍然睇唔通</h3>
+              <p>聽完講解、對完評卷參考，空間關係同「點解咁諗」有時仍未入腦——正正係視覺 lab 要補嘅位。</p>
+            </article>
+          </div>
+          <div class="mono-resolve">
+            <p style="margin:0;color:var(--muted)">
+              <strong>我哋嘅答案：</strong>真正完全免費嘅廣東話一步一圖 lab——唔使報班、唔使信用卡，by topic 打開即學。資源應人人可得；你操完 past paper 唔明圖，隨時嚟睇通。
+            </p>
+            <div class="hero-actions" style="margin-top:1rem">
+              <a class="btn btn-primary" href="learn.html">免費開始學</a>
+              <a class="btn btn-ghost" href="#by-topic">睇課題包</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="by-topic">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>按課題溫習（By topic）· 真正完全免費</h2>
+            <p>
+              對應你搜 by topic 嘅習慣：揀課題包入去，唔使一次吞晒成個大綱。每個視覺 lab <strong style="color:var(--ink)">真正完全免費</strong>——唔使報班，適合「做到某題／某課題唔明」先嚟補圖同步驟。
+            </p>
+          </div>
+          <div class="packs">
+            <article class="pack">
+              <div class="pack-top">
+                <div>
+                  <h3>數感起步</h3>
+                  <div class="strand">By topic · 數與代數基礎</div>
+                </div>
+              </div>
+              <p class="subtitle">整除、有向數、估計、無理數、百分數、比率</p>
+              <div class="topic-chips">
+                <span>整除</span><span>有向數</span><span>百分數</span><span>比率</span>
+              </div>
+              <div class="codes">
+                <span>K1</span><span>K2</span><span>K3</span><span>K4</span><span>K5</span><span>K6</span>
+              </div>
+              <p class="highlight">打好數感底子，之後代數同圖形先唔會亂</p>
+              <p class="hint">K1–K6 · 6 個單元</p>
+              <div class="cta-row">
+                <a class="btn btn-ghost btn-sm" href="learn.html?mode=PRE_DSE&amp;topic=k1">開始數感</a>
+              </div>
+            </article>
+
+            <article class="pack">
+              <div class="pack-top">
+                <div>
+                  <h3>方程與代數</h3>
+                  <div class="strand">By topic · 數與代數</div>
+                </div>
+              </div>
+              <p class="subtitle">代數式到不等式</p>
+              <div class="topic-chips">
+                <span>方程</span><span>聯立方程</span><span>多項式</span><span>不等式</span>
+              </div>
+              <div class="codes">
+                <span>K7</span><span>K8</span><span>K9</span><span>K10</span><span>K11</span><span>K12</span><span>K13</span><span>K14</span>
+              </div>
+              <p class="highlight">由文字建方程，一路練到不等式</p>
+              <p class="hint">K7–K14 · 8 個單元</p>
+              <div class="cta-row">
+                <a class="btn btn-ghost btn-sm" href="learn.html?mode=PRE_DSE&amp;topic=k7">開始代數</a>
+              </div>
+            </article>
+
+            <article class="pack featured-pack" id="geometry-card">
+              <div class="pack-top">
+                <div>
+                  <h3>圖形神技</h3>
+                  <div class="strand">By topic · 度量、圖形與空間</div>
+                </div>
+                <span class="badge">明星賣點 · 失分幾何</span>
+              </div>
+              <p class="subtitle">past paper 最易失分嘅圖形／證明，用畫面一步睇明</p>
+              <div class="topic-chips">
+                <span>畢氏定理</span><span>三角比</span><span>全等相似</span><span>立體圖形</span>
+              </div>
+              <div class="codes">
+                <span>K15</span><span>K16</span><span>K17</span><span>K18</span><span>K19</span><span>K20</span><span>K21</span><span>K22</span><span>K23</span><span>K24</span><span>K25</span><span>K26</span><span>K27</span>
+              </div>
+              <p class="highlight">立體、全等相似、畢氏、三角比——視覺 moat 最強嘅一包</p>
+              <p class="hint">含畢氏視覺證明 · K15–K27</p>
+              <div class="cta-row">
+                <a class="btn btn-primary btn-sm" href="learn.html?mode=PRE_DSE&amp;topic=k25">睇圖形神技</a>
+              </div>
+            </article>
+
+            <article class="pack">
+              <div class="pack-top">
+                <div>
+                  <h3>數據與概率</h3>
+                  <div class="strand">By topic · 數據處理</div>
+                </div>
+              </div>
+              <p class="subtitle">整理、表達、集中趨勢、概率</p>
+              <div class="topic-chips">
+                <span>數據整理</span><span>集中趨勢</span><span>概率</span><span>圖表</span>
+              </div>
+              <div class="codes">
+                <span>K28</span><span>K29</span><span>K30</span><span>K31</span>
+              </div>
+              <p class="highlight">圖表點揀、平均數點計、概率點諗</p>
+              <p class="hint">K28–K31 · 4 個單元</p>
+              <div class="cta-row">
+                <a class="btn btn-ghost btn-sm" href="learn.html?mode=PRE_DSE&amp;topic=k28">開始數據</a>
+              </div>
+            </article>
+
+            <article class="pack pack-wide">
+              <div class="pack-top">
+                <div>
+                  <h3>DSE 高中精讀</h3>
+                  <div class="strand">By topic · 高中必修</div>
+                </div>
+                <span class="badge">全部開放</span>
+              </div>
+              <p class="subtitle">必修 20 個學習單位——長尾課題（軌跡／圓／圖像）都有視覺課</p>
+              <div class="topic-chips">
+                <span>軌跡</span><span>圓的方程</span><span>圖像變換</span><span>直線方程</span>
+              </div>
+              <div class="codes">
+                <span>U1</span><span>U2</span><span>U3</span><span>U4</span><span>U5</span><span>U6</span><span>U7</span><span>U8</span><span>U9</span><span>U10</span><span>U11</span><span>U12</span><span>U13</span><span>U14</span><span>U15</span><span>U16</span><span>U17</span><span>U18</span><span>U19</span><span>U20</span>
+              </div>
+              <p class="highlight">對齊 EDB 高中學習單位；適合 by topic 溫高中卷前補圖</p>
+              <p class="hint">U1–U20 · 全部 20 課可上</p>
+              <div class="cta-row">
+                <a class="btn btn-primary btn-sm" href="learn.html?mode=DSE">進入高中</a>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="after-pp">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>做完 past paper 之後</h2>
+            <p>我哋唔取代 past paper 庫——而係你操完卷、對完評卷參考仍然「睇唔通圖／步驟」時嘅下一站。</p>
+          </div>
+          <div class="steps">
+            <article class="step">
+              <div class="step-num">1</div>
+              <h3>喺合法來源攞卷</h3>
+              <p>
+                用學校／出版社／官方渠道攞 past paper 同 marking scheme。考評局科目資料：
+                <a class="inline" href="https://www.hkeaa.edu.hk/tc/hkdse/assessment/subject_information/category_a_subjects/maths/" rel="noopener noreferrer" target="_blank">HKEAA 數學科</a>。
+              </p>
+            </article>
+            <article class="step">
+              <div class="step-num">2</div>
+              <h3>By topic 操完對答案</h3>
+              <p>照常計 cut-off、對評卷參考。卡喺圖形、證明、建式步驟？記低課題（例如軌跡、圓、畢氏）。</p>
+            </article>
+            <article class="step">
+              <div class="step-num">3</div>
+              <h3>開我哋嘅 lab 睇通</h3>
+              <p>入對應 by topic 單元，廣東話一步一圖重睇——搞通先再返去操下一題。</p>
+            </article>
+          </div>
+          <div class="hero-actions" style="margin-top:1.4rem">
+            <a class="btn btn-primary" href="learn.html">免費開始學</a>
+            <a class="btn btn-ghost" href="#geometry">先睇圖形神技</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="geometry">
+        <div class="wrap">
+          <div class="featured">
+            <div>
+              <div class="tag">FEATURED · 圖形／失分幾何 · K15–K27</div>
+              <h2>圖形神技：past paper 最易失分嘅畫面</h2>
+              <p>
+                全等相似、畢氏、三角比、立體——卷上睇圖唔明，往往唔係「背唔熟公式」，而係空間關係未睇通。呢包係我哋最強視覺賣點；畢氏定理用畫面砌出 a² + b² = c²。
+              </p>
+              <div class="hero-actions" style="margin-top:1.2rem">
+                <a class="btn btn-primary" href="learn.html?mode=PRE_DSE&amp;topic=k25">即刻睇畢氏證明</a>
+                <a class="btn btn-ghost" href="learn.html?mode=PRE_DSE&amp;topic=k27">三角比</a>
+              </div>
+            </div>
+            <div class="feat-card">
+              <strong>一步一圖 lab</strong>
+              <span>三角形 → 三個正方形 → 面積對應，跟住畫面逐步揭開。適合做完卷仲唔明點解失分嘅同學。</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="formula">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>公式唔係淨 PDF 表</h2>
+            <p>搜「公式表」好常見——我哋重點係<strong>睇通點用</strong>：公式點嚟、圖上點對應、計題時點揀。</p>
+          </div>
+          <div class="two-col">
+            <div class="panel-block">
+              <p><strong style="color:var(--ink)">例如畢氏／三角比</strong></p>
+              <p>唔係背完 a²+b²=c² 就算——用視覺證明同 lab 睇清楚邊條邊對應邊個角。</p>
+              <div class="hero-actions" style="margin-top:1rem">
+                <a class="btn btn-ghost btn-sm" href="learn.html?mode=PRE_DSE&amp;topic=k25">K25 畢氏</a>
+                <a class="btn btn-ghost btn-sm" href="learn.html?mode=PRE_DSE&amp;topic=k27">K27 三角比</a>
+              </div>
+            </div>
+            <div class="panel-block">
+              <p><strong style="color:var(--ink)">高中圖像／軌跡／圓</strong></p>
+              <p>圖像變換、軌跡、圓嘅方程——視覺課全部開放，適合 by topic 溫卷前補圖。</p>
+              <div class="hero-actions" style="margin-top:1rem">
+                <a class="btn btn-ghost btn-sm" href="learn.html?mode=DSE">進入高中精讀</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="m1m2">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>M1／M2 延伸部分</h2>
+            <p>M1（微積分與統計）同 M2（代數與微積分）嘅視覺課已經開放，同必修一樣一步一圖、完全免費。</p>
+          </div>
+          <div class="panel-block">
+            <p>
+              想提早用廣東話視覺學延伸數學？M1／M2 視覺單元已經喺學習模式開放，同必修一樣免費、唔使登記。
+            </p>
+            <div class="hero-actions" style="margin-top:1rem">
+              <a class="btn btn-ghost btn-sm" href="learn.html?mode=DSE">睇高中大綱（含 M1／M2 入口）</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="how">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>點樣學（真正完全免費）</h2>
+            <p>三步就夠——對齊你平時 past paper／by topic 流程；全程唔使報班、唔使信用卡。</p>
+          </div>
+          <div class="steps">
+            <article class="step">
+              <div class="step-num">1</div>
+              <h3>揀 By topic 包</h3>
+              <p>數感、代數、圖形、數據，或者高中精讀；直接跳入對應單元。</p>
+            </article>
+            <article class="step">
+              <div class="step-num">2</div>
+              <h3>跟住畫面點一步</h3>
+              <p>每個概念拆成視覺步驟，補返評卷參考寫唔晒嘅「點解咁諗」。</p>
+            </article>
+            <article class="step">
+              <div class="step-num">3</div>
+              <h3>返去操卷</h3>
+              <p>進度自動記低；搞通圖再操下一題／下一份 mock。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap footer-row">
+        <div>
+          <div>© Canon Lessons / DSEMaths · 2026-11-01-free-open</div>
+          <div class="free-pledge" style="margin-top:0.35rem">承諾：視覺 lab 真正完全免費 · 唔使報班 · 唔使信用卡 · 打破「要補習先學到」嘅困局</div>
+        </div>
+        <div class="footer-links">
+          <a href="#free-open">真正完全免費</a>
+          <a href="https://www.threads.com/@dr.hkdse" rel="noopener noreferrer" target="_blank">Threads @dr.hkdse</a>
+          <a href="privacy.html">私隱政策</a>
+          <a href="learn.html">免費開始學</a>
+        </div>
+      </div>
+    </footer>
   </body>
 </html>

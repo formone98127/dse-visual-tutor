@@ -164,6 +164,7 @@ export default function Sidebar({
   continueTarget = null,
   onContinue = null,
   onCloseMenu = null,
+  preferredTopicId = null,
 }) {
   const syllabus = SYLLABUS[mode]
   const stats = useMemo(() => countReady(mode), [mode])
@@ -172,15 +173,26 @@ export default function Sidebar({
   const swipeStart = useRef(null)
 
   // 轉 mode / 揀單元時，自動攤開「上緊課」所在嘅主題；篩選可上課時攤開第一個有課嘅
+  // landing deep-link 可用 preferredTopicId（例如 k25）優先攤開
   useEffect(() => {
     const cur = SYLLABUS[mode].find((t) => t.units.some((u) => u.id === activeUnitId))
     if (cur) {
       setOpenTopic(cur.id)
       return
     }
+    if (preferredTopicId) {
+      const wanted = preferredTopicId.toLowerCase()
+      const hit = SYLLABUS[mode].find(
+        (t) => t.id === wanted || t.code?.toLowerCase() === wanted,
+      )
+      if (hit) {
+        setOpenTopic(hit.id)
+        return
+      }
+    }
     const firstReady = SYLLABUS[mode].find((t) => t.units.some((u) => u.lessonId))
     setOpenTopic(firstReady?.id ?? SYLLABUS[mode][0]?.id ?? null)
-  }, [mode, activeUnitId])
+  }, [mode, activeUnitId, preferredTopicId])
 
   // 手機：向左滑收起側欄，返去 Theater（首頁未揀課唔收）
   const onTouchStart = (e) => {
@@ -241,7 +253,7 @@ export default function Sidebar({
       <section className="flex-1 overflow-y-auto px-7 py-6">
         <div className="mb-4 flex items-center justify-between gap-2">
           <p className="text-xs uppercase tracking-[0.3em] text-zinc-600">
-            {home ? '選擇單元' : '課程列表區'}
+            {home ? 'By topic · 選擇單元' : 'By topic · 課程'}
           </p>
           <span className="font-mono text-[10px] text-zinc-500">
             {stats.ready}/{stats.total} · {stats.pct}%
@@ -285,7 +297,7 @@ export default function Sidebar({
       </section>
 
       <footer className="border-t border-white/[0.06] px-7 py-4">
-        <p className="text-[11px] text-zinc-600">DSE網上課程 · MVP v0.1</p>
+        <p className="text-[11px] text-zinc-600">DSE網上課程 · 完全免費 · 全部 254 課已開放</p>
       </footer>
     </aside>
   )
