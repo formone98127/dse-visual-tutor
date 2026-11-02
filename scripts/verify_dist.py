@@ -11,9 +11,11 @@ def check(label, ok):
         failures.append(label)
 
 
-STAMP = '2026-11-01-launch-ready'
+STAMP = '2026-11-02-ga4'
+GA_ID = 'G-XFB3Y5KTJQ'
 
 landing = Path('dist/index.html').read_text(encoding='utf-8')
+learn = Path('dist/learn.html').read_text(encoding='utf-8') if Path('dist/learn.html').exists() else ''
 print('bytes', len(landing.encode()))
 check('deploy stamp', STAMP in landing)
 check('by-topic section', 'id="by-topic"' in landing)
@@ -21,9 +23,11 @@ check('after-pp section', '做完 past paper' in landing)
 check('hero', '睇唔通圖' in landing)
 check('m1m2 open copy', '視覺課已經開放' in landing)
 check('no stale coming-soon', '逐步開放' not in landing)
-check('ga4 script tag', '/ga4.js' in landing)
-check('learn.html bundled', Path('dist/learn.html').exists())
-check('learn ga4 script tag', '/ga4.js' in Path('dist/learn.html').read_text(encoding='utf-8'))
+check('landing gtag loads', f'googletagmanager.com/gtag/js?id={GA_ID}' in landing)
+check('landing gtag config + privacy params', f"gtag('config', '{GA_ID}', {{ anonymize_ip: true, allow_google_signals: false }})" in landing)
+check('learn.html bundled', bool(learn))
+check('learn gtag loads', f'googletagmanager.com/gtag/js?id={GA_ID}' in learn)
+check('learn gtag config + privacy params', f"gtag('config', '{GA_ID}', {{ anonymize_ip: true, allow_google_signals: false }})" in learn)
 check('builder NOT bundled', not Path('dist/builder.html').exists())
 check('ga4.js shipped', Path('dist/ga4.js').exists())
 

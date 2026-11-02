@@ -1,12 +1,12 @@
 /**
- * 輕量分析：事件寫入本機 + console，再轉發 GA4（如果 /ga4.js 已啟用）。
+ * 輕量分析：事件寫入本機 + console，再轉發 GA4（HTML 已內嵌 gtag snippet 時生效）。
  * 呼叫端照舊 track(name, props)，唔使理送去邊。
  */
 
 const KEY = 'dvt.analytics.v1'
 const MAX_EVENTS = 400
 
-/** GA4 啟用中（/ga4.js 插入咗真 ID）先會送出 */
+/** GA4 啟用中（window.gtag 存在）先會送出 */
 function forwardToGa(name, props) {
   if (typeof window === 'undefined' || typeof window.gtag !== 'function') return
   try {

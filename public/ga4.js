@@ -8,7 +8,7 @@
  * 係 placeholder 嘅時候：唔會載入任何 Google script、唔送任何資料。
  */
 (function () {
-  var MEASUREMENT_ID = 'G-PLACEHOLDER'
+  var MEASUREMENT_ID = 'G-PLACEHOLDER' // unused: gtag now inline in HTML
 
   // 要似正式 GA4 ID（G- + 至少 6 個英數）先會啟動
   if (!/^G-[A-Z0-9]{6,}$/.test(MEASUREMENT_ID) || MEASUREMENT_ID === 'G-PLACEHOLDER') return

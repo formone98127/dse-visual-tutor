@@ -3,6 +3,6 @@
  * Phone WebView appends this so it never keeps an old offline copy.
  * Bump CONTENT_STAMP whenever lesson/scene data ships.
  */
-export const CONTENT_STAMP = '2026-11-01-launch-ready'
+export const CONTENT_STAMP = '2026-11-02-ga4'
 export const CONTENT_VERSION = `0.1.0+${CONTENT_STAMP}`
 
